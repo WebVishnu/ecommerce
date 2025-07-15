@@ -518,8 +518,8 @@ function ProfilePageInner() {
 
   // Function to get current location and fill address
   const handleUseCurrentLocation = async () => {
-    if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser");
+    if (typeof window === 'undefined' || !navigator.geolocation) {
+      alert('Geolocation is not supported by your browser');
       return;
     }
     setLocationLoading(true);

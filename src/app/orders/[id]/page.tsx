@@ -337,7 +337,7 @@ export default function OrderDetailsPage() {
 
     setActionLoading("share");
     try {
-      const orderUrl = `${window.location.origin}/orders/${order._id}`;
+      const orderUrl = typeof window !== 'undefined' ? `${window.location.origin}/orders/${order._id}` : '';
       const shareText = `Check out my order from Shivangi Battery! Order #${order._id
         .slice(-8)
         .toUpperCase()}`;

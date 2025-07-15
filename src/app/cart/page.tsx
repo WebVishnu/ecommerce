@@ -123,7 +123,7 @@ export default function CartPage() {
             <h1 className="text-xl font-bold text-gray-900 mb-2">Error Loading Cart</h1>
             <p className="text-gray-600 mb-4">{error}</p>
             <button
-              onClick={() => window.location.reload()}
+              onClick={() => { if (typeof window !== 'undefined') window.location.reload(); }}
               className="bg-[#b91c1c] text-white px-4 py-2 rounded-md hover:bg-[#a31b1b] transition-colors"
             >
               Try Again

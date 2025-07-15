@@ -203,7 +203,7 @@ function BuyNowCheckoutPageInner() {
 
   // Function to use current location and autofill address
   const handleUseCurrentLocation = async () => {
-    if (!navigator.geolocation) {
+    if (typeof window === 'undefined' || !navigator.geolocation) {
       setError("Geolocation is not supported by your browser");
       return;
     }

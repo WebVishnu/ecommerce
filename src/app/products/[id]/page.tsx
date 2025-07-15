@@ -267,7 +267,7 @@ const ShareModal = ({
   onClose: () => void;
   product: Product;
 }) => {
-  const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
 
   const shareOptions = [
     {
