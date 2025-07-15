@@ -1,0 +1,5 @@
+---
+description: any page you deisng in the frontned it should always be responsive in nature for all the devices
+globs:
+alwaysApply: true
+---
