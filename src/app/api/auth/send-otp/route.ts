@@ -32,7 +32,6 @@ export async function POST(request: NextRequest) {
     }
 
     if (process.env.NODE_ENV === 'production') {
-      console.log('🚀 Production mode: Sending SMS via Message Central');
       const smsResult = await sendOtp(mobile);
       if (!smsResult.success) {
         await OTPService.cleanupExpiredOTPs();

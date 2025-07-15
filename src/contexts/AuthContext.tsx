@@ -39,17 +39,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    console.log("AuthContext: Initializing auth state");
-    
     try {
       // Initialize auth state from localStorage
       const currentUser = authManager.getCurrentUser();
-      console.log("AuthContext: Current user from storage:", currentUser);
       setUser(currentUser);
       
       // Subscribe to auth changes
       const unsubscribe = authManager.subscribe((newUser) => {
-        console.log("AuthContext: User state changed:", newUser);
         setUser(newUser);
       });
 
@@ -65,41 +61,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = (token: string, user: User) => {
-    console.log("AuthContext: Login called with user:", user);
-    console.log("AuthContext: Login called with token:", token ? "Token exists" : "No token");
     authManager.login(token, user);
-    console.log("AuthContext: Login completed, current state:", {
-      user: authManager.getCurrentUser(),
-      isAuthenticated: authManager.isAuthenticated()
-    });
   };
 
   const updateUser = (user: User) => {
-    console.log("AuthContext: UpdateUser called with user:", user);
-    console.log("AuthContext: Current user before update:", authManager.getCurrentUser());
     authManager.updateUser(user);
-    console.log("AuthContext: Current user after update:", authManager.getCurrentUser());
-    console.log("AuthContext: Is authenticated after update:", authManager.isAuthenticated());
     
     // Force a re-render to ensure state is updated
     setUser(user);
   };
 
   const logout = () => {
-    console.log("AuthContext: Logout called");
     authManager.logout();
   };
 
   const isAuthenticated = !!user && authManager.isAuthenticated() && isHydrated;
   
-  console.log("AuthContext: Rendering with state:", {
-    user: !!user,
-    authManagerIsAuthenticated: authManager.isAuthenticated(),
-    isHydrated,
-    finalIsAuthenticated: isAuthenticated,
-    userDetails: user ? { id: user._id, name: user.name, phone: user.phone } : null
-  });
-
   // Ensure we have a valid context value
   const contextValue = {
     user,
@@ -122,7 +99,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    console.warn('useAuth called outside of AuthProvider, using fallback context');
     return fallbackContext;
   }
   return context;

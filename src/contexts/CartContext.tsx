@@ -28,8 +28,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const [isHydrated, setIsHydrated] = useState(false);
 
-  console.log('CartContext: Auth state:', { isAuthenticated, authHydrated });
-
   const fetchCart = async () => {
     
     if (!isAuthenticated || !authHydrated) {

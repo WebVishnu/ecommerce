@@ -495,7 +495,6 @@ export default function AdminProductViewPage() {
     field: string,
     value: string | number | boolean
   ) => {
-    console.log(`Updating ${field}:`, value, typeof value);
     setEditForm((prev) => ({
       ...prev,
       [field]: value,

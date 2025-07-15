@@ -16,14 +16,6 @@ export default function CartPage() {
   const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set());
   const [operationError, setOperationError] = useState<string | null>(null);
 
-  // Debug authentication state
-  console.log('Cart Page Auth State:', {
-    isAuthenticated,
-    authLoading,
-    authHydrated,
-    cartHydrated
-  });
-
   const handleQuantityChange = async (itemId: string, newQuantity: number) => {
     if (newQuantity < 1) return;
     

@@ -218,8 +218,6 @@ export async function seedDatabase() {
   try {
     await dbConnect();
     
-    console.log('Starting database seeding...');
-
     // Clear existing data
     await Product.deleteMany({});
     await User.deleteMany({});
@@ -227,14 +225,10 @@ export async function seedDatabase() {
 
     // Insert sample products
     const products = await Product.insertMany(sampleProducts);
-    console.log(`Inserted ${products.length} products`);
 
     // Insert sample users
     const users = await User.insertMany(sampleUsers);
-    console.log(`Inserted ${users.length} users`);
 
-    console.log('Database seeding completed successfully!');
-    
     return { products, users };
   } catch (error) {
     console.error('Error seeding database:', error);
@@ -246,7 +240,6 @@ export async function seedDatabase() {
 if (require.main === module) {
   seedDatabase()
     .then(() => {
-      console.log('Seeding completed');
       process.exit(0);
     })
     .catch((error) => {

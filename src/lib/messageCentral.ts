@@ -51,24 +51,15 @@ export function isValidOtp(otp: string): boolean {
  * 🔐 Generate Auth Token
  */
 async function generateToken(): Promise<string> {
-  console.log('🔍 Checking environment variables...');
-  console.log('PASSWORD:', PASSWORD ? 'Set' : 'Missing');
-  console.log('BASE_URL:', BASE_URL || 'Missing');
-  console.log('CUSTOMER_ID:', CUSTOMER_ID || 'Missing');
-  console.log('EMAIL:', EMAIL || 'Missing');
-  
   if (!PASSWORD || !BASE_URL || !CUSTOMER_ID || !EMAIL) {
     throw new Error('Message Central environment variables not configured. Please check MESSAGE_CENTRAL_PASSWORD, MESSAGE_CENTRAL_BASE_URL, MESSAGE_CENTRAL_CUSTOMER_ID, and MESSAGE_CENTRAL_EMAIL.');
   }
 
   try {
-    console.log('🔐 Creating base64 key...');
     // Ensure password is properly encoded to base64
     const base64Key = Buffer.from(PASSWORD, 'utf8').toString('base64');
-    console.log('✅ Base64 key created:', base64Key.substring(0, 10) + '...');
 
     const url = `${BASE_URL}/auth/v1/authentication/token?customerId=${CUSTOMER_ID}&key=${encodeURIComponent(base64Key)}&scope=NEW&country=91&email=${encodeURIComponent(EMAIL)}`;
-    console.log('🌐 Requesting token from:', url);
     
     const res = await axios.get<TokenResponse>(url, {
       headers: { 
@@ -77,7 +68,6 @@ async function generateToken(): Promise<string> {
       },
     });
 
-    console.log('✅ Token response received:', res.status, res.data);
     return res.data.token;
   } catch (error) {
     console.error('❌ Token generation failed:', error);
@@ -90,15 +80,12 @@ async function generateToken(): Promise<string> {
  */
 export async function sendOtp(mobileNumber: string): Promise<SendOtpResult> {
   try {
-    console.log('🔐 Generating token...');
     const token = await generateToken();
-    console.log('✅ Token generated:', token ? 'Success' : 'Failed');
 
     if (!token) {
       throw new Error('Failed to generate authentication token');
     }
 
-    console.log('📤 Sending OTP request...');
     const response = await axios.post(
       `${BASE_URL}/verification/v3/send`,
       null,
@@ -116,7 +103,6 @@ export async function sendOtp(mobileNumber: string): Promise<SendOtpResult> {
       }
     );
 
-    console.log('✅ OTP sent successfully');
     return {
       success: true,
       message: 'OTP sent successfully',
@@ -142,11 +128,9 @@ export async function validateOtp(
   code: string
 ): Promise<ValidateOtpResult> {
   try {
-    console.log('🔍 Validating OTP with verificationId:', verificationId);
     const token = await generateToken();
     const url = `${BASE_URL}/verification/v3/validateOtp?verificationId=${verificationId}&code=${code}`;
 
-    console.log('🌐 Validating OTP at:', url);
     const response = await axios.get(url, {
       headers: {
         authToken: token,
@@ -154,8 +138,6 @@ export async function validateOtp(
         'Content-Type': 'application/json',
       },
     });
-
-    console.log('✅ OTP validation response:', response.status, response.data);
 
     // Handle different response structures
     let verificationStatus = 'unknown';
@@ -196,7 +178,6 @@ export async function checkDeliveryStatus(
   verificationId: string
 ): Promise<DeliveryStatusResult> {
   try {
-    console.log('🔍 Checking delivery status for verificationId:', verificationId);
     const token = await generateToken();
     const url = `${BASE_URL}/verification/v3/validateOtp?verificationId=${verificationId}&code=dummy`;
 
@@ -208,8 +189,6 @@ export async function checkDeliveryStatus(
         'Content-Type': 'application/json',
       },
     });
-
-    console.log('✅ Delivery status response:', response.status, response.data);
 
     // Handle different response structures
     let status = 'unknown';

@@ -427,12 +427,6 @@ export class AuthManager {
   isAuthenticated(): boolean {
     const token = storage.getToken();
     const user = storage.getUser();
-    console.log('AuthManager: isAuthenticated check:', { 
-      hasToken: !!token, 
-      hasUser: !!user,
-      token: token ? 'Token exists' : 'No token',
-      user: user ? 'User exists' : 'No user'
-    });
     return !!token && !!user;
   }
 
@@ -442,21 +436,14 @@ export class AuthManager {
   }
 
   login(token: string, user: User) {
-    console.log("AuthManager: Login called with token and user:", { token: !!token, user });
     storage.setToken(token);
     storage.setUser(user);
-    console.log("AuthManager: Storage updated, notifying listeners");
     this.notifyListeners(user);
-    console.log("AuthManager: Login completed");
   }
 
   updateUser(user: User) {
-    console.log("AuthManager: updateUser called with:", user);
-    console.log("AuthManager: Current token:", storage.getToken());
     storage.setUser(user);
-    console.log("AuthManager: User saved to storage, notifying listeners");
     this.notifyListeners(user);
-    console.log("AuthManager: updateUser completed");
   }
 
   logout() {

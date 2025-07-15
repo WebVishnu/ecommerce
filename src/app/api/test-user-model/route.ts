@@ -22,15 +22,11 @@ export async function GET(request: NextRequest) {
       }
     };
     
-    console.log('Testing User model with data:', testUserData);
-    
     try {
       const testUser = await User.create(testUserData);
-      console.log('Test user created successfully:', testUser._id);
       
       // Clean up - delete the test user
       await User.findByIdAndDelete(testUser._id);
-      console.log('Test user cleaned up');
       
       return NextResponse.json({
         success: true,

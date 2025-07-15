@@ -12,15 +12,6 @@ export async function POST(request: NextRequest) {
   try {
     const { mobile, otp } = await request.json();
 
-    console.log('Verify OTP request received:', {
-      mobile,
-      otp,
-      mobileType: typeof mobile,
-      mobileLength: mobile.length,
-      otpType: typeof otp,
-      otpLength: otp.length
-    });
-
     // Validate inputs
     if (!mobile || !otp) {
       return NextResponse.json(
@@ -45,7 +36,6 @@ export async function POST(request: NextRequest) {
 
     // In development environment, use local OTP verification
     if (process.env.NODE_ENV !== 'production') {
-      console.log('🔧 Development mode: Using local OTP verification');
       
       // Verify OTP using the local service
       const verifyResult = await OTPService.verifyOTP(mobile, otp);
@@ -57,10 +47,8 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      console.log('✅ Local OTP verification successful for:', mobile);
     } else {
       // Production environment: Use Message Central API
-      console.log('🚀 Production mode: Using Message Central API verification');
       
       // Get verificationId from stored OTP record
       const verificationIdResult = await OTPService.getVerificationId(mobile);
@@ -81,10 +69,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      console.log('✅ Message Central OTP verification successful for:', mobile);
     }
-
-    console.log('OTP verified successfully for:', mobile);
 
     // Connect to database
     await connectDB();
@@ -125,11 +110,8 @@ export async function POST(request: NextRequest) {
       // Don't include email field if it's empty to avoid index conflicts
       // Email will be added later during profile completion
 
-      console.log('Creating new user with data:', userData);
-
       try {
         user = await User.create(userData);
-        console.log('User created successfully:', user._id);
       } catch (createError: unknown) {
         console.error('User creation error:', createError);
         return NextResponse.json(
@@ -139,7 +121,6 @@ export async function POST(request: NextRequest) {
       }
     } else {
       // Update existing user's phone verification status
-      console.log('Updating existing user:', user._id);
       user.phoneVerified = true;
       await user.save();
     }

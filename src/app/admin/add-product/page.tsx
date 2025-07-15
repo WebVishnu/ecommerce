@@ -152,7 +152,6 @@ function AddProductPageInner() {
   const saveToLocalStorage = useCallback((data: ProductFormData) => {
     try {
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
-      console.log("Saved to localStorage");
     } catch (error) {
       console.error("Error saving to localStorage:", error);
     }
@@ -165,7 +164,6 @@ function AddProductPageInner() {
         const parsed = JSON.parse(saved);
         setFormData(parsed);
         setHasUnsavedChanges(true);
-        console.log("Loaded draft from localStorage");
       }
     } catch (error) {
       console.error("Error loading from localStorage:", error);
@@ -202,7 +200,6 @@ function AddProductPageInner() {
         });
         setDraftId(productId);
         setHasUnsavedChanges(false);
-        console.log("Loaded product for editing");
       }
     } catch (error) {
       console.error("Error loading product for edit:", error);
@@ -235,7 +232,6 @@ function AddProductPageInner() {
         });
         setDraftId(draftId);
         setHasUnsavedChanges(false);
-        console.log("Loaded draft from database");
       }
     } catch (error) {
       console.error("Error loading draft:", error);
@@ -273,7 +269,6 @@ function AddProductPageInner() {
           setDraftId(data.data.draft._id);
         }
         setHasUnsavedChanges(false);
-        console.log("Draft saved successfully");
       } else {
         console.error("Failed to save draft:", data.message);
       }

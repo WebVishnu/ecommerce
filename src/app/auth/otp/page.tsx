@@ -26,7 +26,6 @@ export default function OtpAuthPage() {
     if (!isHydrated) return; // Wait for auth to hydrate
 
     if (isAuthenticated && user) {
-      console.log("User already authenticated, redirecting to home");
       router.push("/");
       return;
     }
@@ -38,15 +37,9 @@ export default function OtpAuthPage() {
   // Handle redirect after successful login
   useEffect(() => {
     if (isAuthenticated && user && pendingRedirect) {
-      console.log(
-        "User authenticated, handling pending redirect:",
-        pendingRedirect
-      );
       if (pendingRedirect.requiresProfileCompletion) {
-        console.log("Redirecting to profile completion");
         router.push("/auth/profile-complete");
       } else {
-        console.log("Redirecting to home page");
         router.push("/");
       }
       setPendingRedirect(null);
@@ -104,7 +97,6 @@ export default function OtpAuthPage() {
         ? Math.min(data.expiresIn - 180, 120)
         : 120; // 3 minutes before OTP expires, max 2 minutes
       
-      console.log('⏰ Setting initial countdown for:', resendTime, 'seconds');
       setCountdown(resendTime);
       
       // Clear any existing timer
@@ -150,14 +142,8 @@ export default function OtpAuthPage() {
         throw new Error(data.message || "Invalid OTP");
       }
 
-      console.log("OTP verification successful:", data.data);
-
       // Login using auth context
       login(data.data.token, data.data.user);
-
-      console.log("Auth context updated with login");
-
-      setInfo(data.message);
 
       // Set pending redirect - the useEffect will handle the actual redirect
       setPendingRedirect({
@@ -178,7 +164,6 @@ export default function OtpAuthPage() {
     setLoading(true);
 
     try {
-      console.log('🔄 Resending OTP to:', mobile);
       
       const res = await fetch("/api/auth/send-otp", {
         method: "POST",
@@ -192,7 +177,6 @@ export default function OtpAuthPage() {
         throw new Error(data.message || "Failed to resend OTP");
       }
 
-      console.log('✅ OTP resent successfully');
       setInfo("OTP resent successfully");
       setOtp(""); // Clear previous OTP
 
@@ -201,7 +185,6 @@ export default function OtpAuthPage() {
         ? Math.min(data.expiresIn - 180, 120)
         : 120; // 3 minutes before OTP expires, max 2 minutes
       
-      console.log('⏰ Setting countdown for:', resendTime, 'seconds');
       setCountdown(resendTime);
       
       // Clear any existing timer

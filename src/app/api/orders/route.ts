@@ -90,8 +90,6 @@ export async function POST(request: NextRequest) {
       notes: orderNotes || '',
     };
 
-    console.log('Creating order with data:', JSON.stringify(orderData, null, 2));
-
     const order = new Order(orderData);
 
     await order.save();

@@ -142,7 +142,6 @@ function SearchPageInner() {
   }, [searchQuery, selectedCategory, selectedBrand, priceRange, pagination.page]);
 
   const handleAddToCart = (product: Product) => {
-    console.log("Added to cart:", product);
   };
 
   const clearFilters = () => {

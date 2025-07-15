@@ -147,7 +147,6 @@ export default function OrderDetailsPage() {
 
   const fetchOrderDetails = async () => {
     try {
-      console.log("Fetching order details for ID:", orderId);
       const token = localStorage.getItem("authToken");
       if (!token) {
         throw new Error("Authentication required");
@@ -160,7 +159,6 @@ export default function OrderDetailsPage() {
       });
 
       const data = await response.json();
-      console.log("Order details response:", data);
 
       if (!data.success) {
         throw new Error(data.message || "Failed to fetch order details");

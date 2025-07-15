@@ -41,7 +41,6 @@ export default function ProfileCompletePage() {
   // Handle redirect after profile completion
   useEffect(() => {
     if (pendingRedirect && user && !needsProfileCompletion(user)) {
-      console.log("Profile completed, redirecting to home");
       router.push("/");
       setPendingRedirect(false);
     }
@@ -109,12 +108,8 @@ export default function ProfileCompletePage() {
         throw new Error(data.message || "Failed to update profile");
       }
       
-      console.log("Profile update successful:", data.data.user);
-      
       // Update auth context with new user data
       updateUser(data.data.user);
-      
-      console.log("Auth context updated, setting pending redirect...");
       
       // Set pending redirect - the useEffect will handle the actual redirect
       setPendingRedirect(true);
