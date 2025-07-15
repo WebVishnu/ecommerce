@@ -123,3 +123,4 @@ The frontend expects the following backend endpoints:
 3. Add proper error handling
 4. Test with the backend server running
 # ecommerce
+# ecommerce
