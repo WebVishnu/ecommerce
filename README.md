@@ -1,36 +1,125 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Shivangi Battery Ecommerce Frontend
 
-## Getting Started
+A modern ecommerce frontend built with Next.js and Apollo Client to connect with the Busiman GraphQL backend.
 
-First, run the development server:
+## Features
+
+- 🛍️ **Product Catalog**: Display products from the GraphQL backend
+- 🔍 **Search Functionality**: Search products by name, description, or category
+- 🛒 **Shopping Cart**: Add products to cart with real-time updates
+- 📱 **Responsive Design**: Mobile-first design with Tailwind CSS
+- ⚡ **GraphQL Integration**: Real-time data fetching with Apollo Client
+- 🎨 **Modern UI**: Clean and intuitive user interface
+
+## Prerequisites
+
+- Node.js 18+ 
+- The Busiman backend server running on `localhost:4000`
+
+## Setup Instructions
+
+### 1. Install Dependencies
+
+```bash
+npm install
+```
+
+### 2. Start the Backend Server
+
+Make sure the Busiman backend server is running on `localhost:4000`. Navigate to the backend directory and start it:
+
+```bash
+cd ../../busiman\ server
+npm run dev
+```
+
+### 3. Start the Frontend Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The frontend will be available at `http://localhost:3000`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/                    # Next.js app directory
+│   ├── layout.tsx         # Root layout with Apollo Provider
+│   └── page.tsx           # Main homepage
+├── components/            # React components
+│   ├── Header.tsx         # Navigation header
+│   ├── ProductCard.tsx    # Individual product display
+│   └── ProductGrid.tsx    # Product grid layout
+├── graphql/              # GraphQL queries
+│   └── queries/
+│       └── products.ts    # Product-related queries
+├── lib/                  # Utility libraries
+│   ├── apollo-client.ts  # Apollo Client configuration
+│   └── utils.ts          # Common utility functions
+└── types/                # TypeScript type definitions
+    └── product.ts        # Product interface types
+```
 
-## Learn More
+## GraphQL Integration
 
-To learn more about Next.js, take a look at the following resources:
+The frontend connects to the Busiman backend GraphQL API at `http://localhost:4000/api/v2/graphql`. 
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Available Queries
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `GET_ALL_PRODUCTS`: Fetch all products with stock information
+- `GET_PRODUCT_BY_ID`: Fetch a specific product by ID
+- `GET_PRODUCTS_BY_CATEGORY`: Fetch products filtered by category
 
-## Deploy on Vercel
+### Product Data Structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Products include:
+- Basic information (name, price, description)
+- Stock levels across different stores
+- Categories and specifications
+- Serial numbers (for serializable products)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Development
+
+### Adding New Features
+
+1. **New GraphQL Queries**: Add them to `src/graphql/queries/`
+2. **New Components**: Create them in `src/components/`
+3. **New Types**: Define them in `src/types/`
+
+### Styling
+
+The project uses Tailwind CSS for styling. Custom styles can be added to `src/app/globals.css`.
+
+## Troubleshooting
+
+### Backend Connection Issues
+
+If you see "Error Loading Products":
+1. Ensure the backend server is running on `localhost:4000`
+2. Check that the GraphQL endpoint is accessible
+3. Verify CORS settings in the backend
+
+### Build Issues
+
+If you encounter build errors:
+1. Clear the `.next` directory: `rm -rf .next`
+2. Reinstall dependencies: `npm install`
+3. Restart the development server
+
+## API Endpoints
+
+The frontend expects the following backend endpoints:
+
+- **GraphQL**: `http://localhost:4000/api/v2/graphql`
+- **Authentication**: `http://localhost:4000/api/v2/auth/*`
+- **User Management**: `http://localhost:4000/api/v2/user/*`
+
+## Contributing
+
+1. Follow the existing code structure
+2. Use TypeScript for type safety
+3. Add proper error handling
+4. Test with the backend server running
+# ecommerce
