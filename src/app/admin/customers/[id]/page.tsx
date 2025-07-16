@@ -129,7 +129,6 @@ export default function AdminCustomerDetailPage() {
     setOrdersLoading(true);
     try {
       const token = localStorage.getItem("authToken");
-      // Fetch orders
       const res = await fetch(`/api/orders?customerId=${customerId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });

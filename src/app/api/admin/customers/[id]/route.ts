@@ -16,7 +16,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ success: false, message: 'Admin access required' }, { status: 403 });
     }
     const customer = await User.findOne({ _id: params.id, role: { $in: ['customer', 'admin'] } })
-      .select('_id name email phone isActive createdAt addresses')
+      .select('_id name email role phone isActive createdAt addresses')
       .lean();
     if (!customer) {
       return NextResponse.json({ success: false, message: 'Customer not found' }, { status: 404 });

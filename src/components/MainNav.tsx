@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Logo from "./Logo";
-import { Search, User, ShoppingCart, Menu, X, LogOut, Settings, User as UserIcon } from "lucide-react";
+import { Search, User, ShoppingCart, Menu, X, LogOut, Settings, User as UserIcon, Phone } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
@@ -64,7 +64,7 @@ export default function MainNav() {
         <div className="hidden lg:flex items-center gap-6">
           <Link href="/brands" className="uppercase text-sm tracking-widest text-gray-700 hover:text-black">Brands</Link>
           <Link href="/about" className="uppercase text-sm tracking-widest text-gray-700 hover:text-black">About Us</Link>
-          <Link href="/contact" className="uppercase text-sm tracking-widest text-gray-700 hover:text-black">Contact</Link>
+          <a href="tel:+919761145106" className="uppercase text-sm tracking-widest text-gray-700 hover:text-black">Contact</a>
           <Search onClick={() => router.push('/search')} className="h-5 w-5 text-gray-700 hover:text-black cursor-pointer" />
           {authHydrated && isAuthenticated ? (
             <div className="relative" ref={userMenuRef}>
@@ -281,14 +281,10 @@ export default function MainNav() {
                     <span className="w-2 h-2 bg-[#b91c1c] rounded-full"></span>
                     About Us
                   </Link>
-                  <Link 
-                    href="/contact" 
-                    className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors" 
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    <span className="w-2 h-2 bg-[#b91c1c] rounded-full"></span>
+                  <a href="tel:+919761145106" className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
+                    <Phone className="w-4 h-4" />
                     Contact
-                  </Link>
+                  </a>
                 </div>
               </nav>
             </div>

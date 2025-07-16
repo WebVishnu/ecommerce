@@ -147,9 +147,22 @@ export async function GET(request: NextRequest) {
     const user = (request as any).user;
     await connectDB();
 
-    // If admin, fetch all orders
+    // Parse customerId from query string
+    const { searchParams } = new URL(request.url);
+    const customerId = searchParams.get('customerId');
+
     let orders;
-    if (user.role === 'admin') {
+    if (user.role === 'admin' && customerId) {
+      // If admin and customerId is provided, filter by customerId
+      orders = await Order.find({ user: customerId })
+        .populate({
+          path: 'items.product',
+          model: 'Product',
+          select: 'name brand model capacity voltage warranty images'
+        })
+        .sort({ createdAt: -1 });
+    } else if (user.role === 'admin') {
+      // If admin and no customerId, return all orders
       orders = await Order.find({})
         .populate({
           path: 'items.product',
@@ -158,6 +171,7 @@ export async function GET(request: NextRequest) {
         })
         .sort({ createdAt: -1 });
     } else {
+      // Non-admin: only their own orders
       orders = await Order.find({ user: user._id })
         .populate({
           path: 'items.product',

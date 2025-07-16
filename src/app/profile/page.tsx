@@ -125,7 +125,7 @@ function ProfilePageInner() {
       const token = localStorage.getItem("authToken");
       if (!token) return;
 
-      const response = await fetch("/api/orders", {
+      const response = await fetch(`/api/orders?customerId=${user?._id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -141,7 +141,6 @@ function ProfilePageInner() {
       setOrdersLoading(false);
     }
   };
-
 
   // Show loading state while checking authentication
   if (loading || !isHydrated) {
@@ -518,8 +517,8 @@ function ProfilePageInner() {
 
   // Function to get current location and fill address
   const handleUseCurrentLocation = async () => {
-    if (typeof window === 'undefined' || !navigator.geolocation) {
-      alert('Geolocation is not supported by your browser');
+    if (typeof window === "undefined" || !navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
       return;
     }
     setLocationLoading(true);
@@ -699,18 +698,18 @@ function ProfilePageInner() {
             </h3>
             {showAddressForm ? (
               <button
-                onClick={() =>{
+                onClick={() => {
                   setShowAddressForm(false);
                   setEditingAddressIndex(null);
                   setAddressForm({
-                    name:"",
-                    phone:"",
-                    street:"",
-                    city:"",
-                    state:"",
-                    pincode:"",
-                    isDefault:false,
-                    addressType:"home",
+                    name: "",
+                    phone: "",
+                    street: "",
+                    city: "",
+                    state: "",
+                    pincode: "",
+                    isDefault: false,
+                    addressType: "home",
                     landmark: "",
                   });
                 }}
@@ -1034,11 +1033,14 @@ function ProfilePageInner() {
               key={order._id}
               className="bg-white p-6 rounded-lg shadow-sm border border-gray-200"
             >
-              <div className="flex flex-row items-center justify-between mb-4 cursor-pointer" onClick={()=>router.push(`/orders/${order._id}`)}>
+              <div
+                className="flex flex-row items-center justify-between mb-4 cursor-pointer"
+                onClick={() => router.push(`/orders/${order._id}`)}
+              >
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900">
                     Order #{order._id.slice(-8).toUpperCase()}
-                  </h3> 
+                  </h3>
                   <p className="text-sm text-gray-600">
                     Placed on{" "}
                     {new Date(order.createdAt).toLocaleDateString("en-IN", {
@@ -1079,34 +1081,38 @@ function ProfilePageInner() {
               {/* Product Preview */}
               <div className="mb-4">
                 <div className="flex gap-3 overflow-x-auto pb-2">
-                  {order.items.slice(0, 2).map((item: OrderItem, index: number) => (
-                    <div
-                      key={index}
-                      onClick={()=>router.push(`/products/${item.product?._id}`)}
-                      className="flex items-center gap-2 min-w-0 flex-shrink-0 cursor-pointer hover:border-2 w-full rounded-md"
-                    >
-                      <div className="w-12 h-12 bg-gray-100 rounded-md flex items-center justify-center">
-                        {item.product?.images &&
-                        item.product?.images.length > 0 ? (
-                          <img
-                            src={item.product.images[0]}
-                            alt={item.product?.name || "Product"}
-                            className="w-full h-full object-cover rounded-md"
-                          />
-                        ) : (
-                          <ShoppingBag className="w-6 h-6 text-gray-400" />
-                        )}
+                  {order.items
+                    .slice(0, 2)
+                    .map((item: OrderItem, index: number) => (
+                      <div
+                        key={index}
+                        onClick={() =>
+                          router.push(`/products/${item.product?._id}`)
+                        }
+                        className="flex items-center gap-2 min-w-0 flex-shrink-0 cursor-pointer hover:border-2 w-full rounded-md"
+                      >
+                        <div className="w-12 h-12 bg-gray-100 rounded-md flex items-center justify-center">
+                          {item.product?.images &&
+                          item.product?.images.length > 0 ? (
+                            <img
+                              src={item.product.images[0]}
+                              alt={item.product?.name || "Product"}
+                              className="w-full h-full object-cover rounded-md"
+                            />
+                          ) : (
+                            <ShoppingBag className="w-6 h-6 text-gray-400" />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-medium text-gray-900 text-sm truncate">
+                            {item.product?.name}
+                          </p>
+                          <p className="text-xs text-gray-600">
+                            Qty: {item.quantity}
+                          </p>
+                        </div>
                       </div>
-                      <div className="min-w-0">
-                        <p className="font-medium text-gray-900 text-sm truncate">
-                          {item.product?.name}
-                        </p>
-                        <p className="text-xs text-gray-600">
-                          Qty: {item.quantity}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
                   {order.items.length > 2 && (
                     <div className="flex items-center gap-2 min-w-0 flex-shrink-0">
                       <div className="w-12 h-12 bg-gray-100 rounded-md flex items-center justify-center">
