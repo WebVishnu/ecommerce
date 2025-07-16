@@ -13,6 +13,7 @@ import {
   MapPin,
   Info,
   AlertTriangle,
+  Phone,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -340,7 +341,11 @@ export default function AdminOrderDetailsPage() {
         loading={actionLoading === confirm.type}
       />
       {/* Sticky header */}
-      <div className="sticky top-0 z-30 bg-white shadow flex flex-col md:flex-row items-center justify-between px-8 py-4 border-b border-gray-200">
+      <div
+        className={`sticky ${
+          isAdmin ? "top-8" : "top-0"
+        } z-30 bg-white shadow flex flex-col md:flex-row items-center justify-between px-8 py-4 border-b border-gray-200`}
+      >
         <div className="flex items-center gap-3">
           <FileText className="w-7 h-7 text-blue-700" />
           <span
@@ -437,89 +442,119 @@ export default function AdminOrderDetailsPage() {
         </div>
       </div>
       {/* Main Content */}
-      <div className="flex flex-col lg:flex-row gap-8 sm:px-8 py-8 w-full">
+      <div className="flex flex-col lg:flex-row gap-8 sm:px-8 py-6 w-full">
         {/* Left: Order Details */}
         <div className="flex-1 min-w-[320px]">
-          <div className="sm:bg-white rounded-xl sm:shadow sm:p-6 px-2 mb-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <div className="mb-3 flex items-center gap-2 text-gray-700">
-                  <User2 className="w-5 h-5" />{" "}
-                  <span className="font-semibold">User:</span>{" "}
-                  {order.shippingAddress?.name ||
-                    order.shippingAddress?.email ||
-                    "-"}
+          <div className="bg-white rounded-xl shadow p-5 sm:mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              {/* User Info */}
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 text-gray-700">
+                  <User2 className="w-5 h-5 text-blue-500" />
+                  <span className="font-semibold">User:</span>
+                  <span className="truncate">
+                    {order.shippingAddress?.name ||
+                      order.shippingAddress?.email ||
+                      "-"}
+                  </span>
                 </div>
-                <div className="mb-3 flex items-center gap-2 text-gray-700">
-                  <CreditCard className="w-5 h-5" />{" "}
-                  <span className="font-semibold">Payment:</span>{" "}
-                  {order.paymentMethod?.toUpperCase() || "-"} (
-                  {order.paymentStatus})
+                <div className="flex items-center gap-2 text-gray-700">
+                  <Phone className="w-5 h-5 text-blue-500" />
+                  <span className="font-semibold">Phone:</span>
+                  <span className="truncate" >
+                    {order.shippingAddress?.phone || "-"}
+                  </span>
                 </div>
-                <div className="mb-3 flex items-start gap-2 text-gray-700 ">
-                  <MapPin className="w-5 h-5" />{" "}
-                  <span className="font-semibold">Shipping Address:</span>
-                  <div className="text-right text-sm text-gray-600">
-                    {order.shippingAddress?.name && (
-                      <div>{order.shippingAddress.name}</div>
-                    )}
-                    {order.shippingAddress?.phone && (
-                      <div>{order.shippingAddress.phone}</div>
-                    )}
-                    <div>
-                      {order.shippingAddress?.street},{" "}
-                      {order.shippingAddress?.city},{" "}
-                      {order.shippingAddress?.state} -{" "}
-                      {order.shippingAddress?.pincode}
-                    </div>
-                  </div>
-                </div>
-                <div className="mb-3 flex items-start gap-2 text-gray-700">
-                  <MapPin className="w-5 h-5" />{" "}
-                  <span className="font-semibold">Billing Address:</span>
-                  <div className="text-right text-sm text-gray-600">
-                    {order.billingAddress?.name && (
-                      <div>{order.billingAddress.name}</div>
-                    )}
-                    {order.billingAddress?.phone && (
-                      <div>{order.billingAddress.phone}</div>
-                    )}
-                    <div>
-                      {order.billingAddress?.street},{" "}
-                      {order.billingAddress?.city},{" "}
-                      {order.billingAddress?.state} -{" "}
-                      {order.billingAddress?.pincode}
-                    </div>
-                  </div>
-                </div>
-                {order.notes && (
-                  <div className="mb-3 flex items-center gap-2 text-gray-700">
-                    <Info className="w-5 h-5" />{" "}
-                    <span className="font-semibold">Notes:</span>{" "}
-                    <span className="ml-1 text-gray-600">{order.notes}</span>
-                  </div>
-                )}
-              </div>
-              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <div className="mb-2 flex items-center gap-2">
-                  <span className="font-semibold">Subtotal:</span> ₹
-                  {order.subtotal}
-                </div>
-                <div className="mb-2 flex items-center gap-2">
-                  <span className="font-semibold">Tax:</span> ₹{order.tax}
-                </div>
-                <div className="mb-2 flex items-center gap-2">
-                  <span className="font-semibold">Shipping:</span> ₹
-                  {order.shipping}
-                </div>
-                <div className="mb-2 flex items-center gap-2 text-lg">
-                  <span className="font-bold">Total:</span> ₹{order.total}
+                <div className="flex items-center gap-2 text-gray-700">
+                  <CreditCard className="w-5 h-5 text-green-500" />
+                  <span className="font-semibold">Payment:</span>
+                  <span className="uppercase">
+                    {order.paymentMethod || "-"}
+                  </span>
+                  <span
+                    className={`ml-2 px-2 py-0.5 rounded text-xs font-semibold ${
+                      order.paymentStatus === "paid"
+                        ? "bg-green-100 text-green-700"
+                        : order.paymentStatus === "pending"
+                        ? "bg-yellow-100 text-yellow-700"
+                        : order.paymentStatus === "refunded"
+                        ? "bg-gray-100 text-gray-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {order.paymentStatus}
+                  </span>
                 </div>
               </div>
             </div>
+            {/* Addresses */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <MapPin className="w-5 h-5 text-blue-500" />
+                  <span className="font-semibold">Shipping Address</span>
+                </div>
+                <div className="text-sm text-gray-700">
+                  {order.shippingAddress?.name && (
+                    <div>{order.shippingAddress.name}</div>
+                  )}
+                  {order.shippingAddress?.phone && (
+                    <div>{order.shippingAddress.phone}</div>
+                  )}
+                  <div>
+                    {order.shippingAddress?.street},{" "}
+                    {order.shippingAddress?.city},{" "}
+                    {order.shippingAddress?.state} -{" "}
+                    {order.shippingAddress?.pincode}
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <MapPin className="w-5 h-5 text-green-500" />
+                  <span className="font-semibold">Billing Address</span>
+                </div>
+                <div className="text-sm text-gray-700">
+                  {order.billingAddress?.name && (
+                    <div>{order.billingAddress.name}</div>
+                  )}
+                  {order.billingAddress?.phone && (
+                    <div>{order.billingAddress.phone}</div>
+                  )}
+                  <div>
+                    {order.billingAddress?.street}, {order.billingAddress?.city}
+                    , {order.billingAddress?.state} -{" "}
+                    {order.billingAddress?.pincode}
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Notes */}
+            {order.notes && (
+              <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <Info className="w-5 h-5 text-blue-400" />
+                <span className="font-semibold">Notes:</span>
+                <span className="ml-1 text-gray-700">{order.notes}</span>
+              </div>
+            )}
+            {/* Call Customer Button */}
+            <div className="mt-8 flex fixed bottom-2 left-2 z-20">
+              <a
+                href={order.shippingAddress?.phone ? `tel:${order.shippingAddress.phone}` : undefined}
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                  ${order.shippingAddress?.phone ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                aria-label="Call Customer"
+                tabIndex={order.shippingAddress?.phone ? 0 : -1}
+                {...(!order.shippingAddress?.phone && { onClick: e => e.preventDefault() })}
+              >
+                <Phone className="w-5 h-5" />
+                Call Customer
+              </a>
+            </div>
+            {/* Order Summary removed from here */}
           </div>
           {/* Actions */}
-          <div className="flex flex-wrap gap-3 mb-8 px-2">
+          <div className="flex flex-wrap gap-3 mb-8 px-2 my-4">
             {/* Payment Status Stepper */}
             <div className="w-full flex flex-col gap-2">
               <span className="font-semibold">Payment Status:</span>
@@ -595,27 +630,6 @@ export default function AdminOrderDetailsPage() {
                 })}
               </div>
             </div>
-            {/* Refund Button */}
-            {(actionLoading === "refund" ||
-              order.status === "cancelled" ||
-              order.paymentStatus === "refunded") && (
-              <button
-                className="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50"
-                onClick={() => setConfirm({ type: "refund" })}
-                disabled={
-                  actionLoading === "refund" ||
-                  order.status === "cancelled" ||
-                  order.paymentStatus === "refunded"
-                }
-                aria-label="Mark as refunded"
-              >
-                {actionLoading === "refund" ? (
-                  <Loader2 className="animate-spin inline w-4 h-4" />
-                ) : (
-                  "Mark as Refunded"
-                )}
-              </button>
-            )}
             {/* Cancel Button: Only show if order.status === 'pending' */}
             {order.status === "pending" && (
               <button
@@ -646,41 +660,87 @@ export default function AdminOrderDetailsPage() {
         </div>
         {/* Right: Items */}
         <div className="flex-1 min-w-[320px]">
-          <div className="bg-white rounded-xl shadow p-6">
-            <span className="font-semibold text-lg">Items</span>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              {order.items.map((item: any, idx: number) => (
-                <div
-                  key={idx}
-                  className="flex gap-3 bg-gray-50 border border-gray-200 rounded-lg p-3 items-center"
-                >
-                  {item.product?.images && item.product.images.length > 0 && (
-                    <img
-                      src={item.product.images[0]}
-                      alt={item.product.name}
-                      className="w-16 h-16 object-cover rounded"
-                    />
-                  )}
-                  <div className="flex-1">
-                    <div className="font-medium text-gray-900">
-                      {item.product?.name || "Product"}
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      Qty: {item.quantity} × ₹{item.price}
-                    </div>
-                    {item.product?.brand && (
-                      <div className="text-xs text-gray-400">
-                        Brand: {item.product.brand}
-                      </div>
-                    )}
-                    {item.product?.model && (
-                      <div className="text-xs text-gray-400">
-                        Model: {item.product.model}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
+          <div className="bg-white rounded-xl shadow sm:p-5 px-2">
+            <span className="font-semibold text-lg">Products List</span>
+            <div className="overflow-x-auto mt-4">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead>
+                  <tr>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                      Name
+                    </th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                      Price
+                    </th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                      Qty
+                    </th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                      Subtotal
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {order.items.map((item: any, idx: number) => {
+                    const product = item.product;
+                    const productId = product?._id || product?.id;
+                    return (
+                      <tr
+                        key={idx}
+                        className="hover:bg-gray-50 transition-colors"
+                      >
+                        <td
+                          className="px-3 py-2 font-medium text-blue-700 cursor-pointer underline hover:text-blue-900"
+                          onClick={() =>
+                            productId && router.push(`/products/${productId}`)
+                          }
+                          tabIndex={0}
+                          role="button"
+                          aria-label={`View details for ${
+                            product?.name || "Product"
+                          }`}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              productId &&
+                                router.push(`/products/${productId}`);
+                            }
+                          }}
+                        >
+                          {product?.name || "Product"}
+                        </td>
+                        <td className="px-3 py-2 text-gray-700 text-sm">
+                          ₹{item.price}
+                        </td>
+                        <td className="px-3 py-2 text-gray-700 text-sm">
+                          {item.quantity}
+                        </td>
+                        <td className="px-3 py-2 text-gray-700 text-sm">
+                          ₹{item.price * item.quantity}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            {/* Order Summary moved here */}
+            <div className="bg-gray-100 rounded-lg p-4 border border-gray-200 flex flex-col gap-2 max-w-xs ml-auto mt-8">
+              <div className="flex items-center justify-between text-gray-700">
+                <span className="font-semibold">Subtotal:</span>
+                <span>₹{order.subtotal}</span>
+              </div>
+              <div className="flex items-center justify-between text-gray-700">
+                <span className="font-semibold">Tax:</span>
+                <span>₹{order.tax}</span>
+              </div>
+              <div className="flex items-center justify-between text-gray-700">
+                <span className="font-semibold">Shipping:</span>
+                <span>₹{order.shipping}</span>
+              </div>
+              <div className="flex items-center justify-between text-lg font-bold text-black border-t border-gray-300 pt-2 mt-2">
+                <span>Total:</span>
+                <span>₹{order.total}</span>
+              </div>
             </div>
           </div>
         </div>

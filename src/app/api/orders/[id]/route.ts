@@ -17,11 +17,17 @@ export async function GET(
 
     await connectDB();
 
-    // Find the order and ensure it belongs to the authenticated user
-    const order = await Order.findOne({ 
-      _id: orderId,
-      user: user._id 
-    }).populate({
+    // Check if user is admin
+    let isAdmin = false;
+    try {
+      const adminResult = await requireAdmin(request);
+      if (!adminResult) isAdmin = true;
+    } catch {}
+
+    // If admin, fetch any order by _id; else, only their own order
+    const order = await Order.findOne(
+      isAdmin ? { _id: orderId } : { _id: orderId, user: user._id }
+    ).populate({
       path: 'items.product',
       model: 'Product',
       select: 'name brand model capacity voltage warranty images'

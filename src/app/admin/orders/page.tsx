@@ -20,12 +20,10 @@ type Order = {
     pincode?: string;
   };
   items: {
-    product: {
-      name: string;
-      // ... other product fields if needed
-    };
+    name: string;
     price: number;
     quantity: number;
+    product?: { _id: string; name: string }; // Added product field
   }[];
   createdAt: string;
   status: string;
@@ -147,7 +145,7 @@ export default function AdminOrdersPage() {
     const isActive = sortBy === field;
     return (
       <th
-        className="p-2 border whitespace-nowrap cursor-pointer select-none hover:bg-blue-100 transition"
+        className="p-2 text-black border whitespace-nowrap cursor-pointer select-none hover:bg-blue-100 transition"
         onClick={() => {
           if (isActive) setSortOrder(sortOrder === "asc" ? "desc" : "asc");
           else {
@@ -191,7 +189,7 @@ export default function AdminOrdersPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-2 md:p-6">
+    <div className="max-w-7xl mx-auto p-2 md:p-6 bg-white">
       {/* Compact Analytics Section */}
       {analytics && (
         <div className="md:flex grid grid-cols-3 text-center flex-wrap gap-4 mb-4 text-xs text-gray-700">
@@ -244,8 +242,8 @@ export default function AdminOrdersPage() {
           )}
         </div>
       )}
-      {/* Filters/Search Row */}
-      <div className="flex flex-col md:flex-row gap-2 mb-4 items-center sm:bg-white rounded-lg sm:shadow sm:px-4 py-3">
+
+      <div className="flex flex-col md:flex-row gap-2 mb-4 items-center sm:bg-white rounded-lg sm:px-4 py-3">
         <div className="relative w-full md:w-64">
           <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
             <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
@@ -281,7 +279,7 @@ export default function AdminOrdersPage() {
             setStatusFilter(e.target.value);
             setPage(1);
           }}
-          className="border border-gray-300 px-2 py-2 rounded-lg text-sm md:text-base w-full md:w-48 focus:ring-2 focus:ring-blue-200 focus:outline-none bg-gray-50"
+          className="border text-black border-gray-300 px-2 py-2 rounded-lg text-sm md:text-base w-full md:w-48 focus:ring-2 focus:ring-blue-200 focus:outline-none bg-gray-50"
         >
           <option value="">All Statuses</option>
           <option value="pending">Pending</option>
@@ -296,11 +294,15 @@ export default function AdminOrdersPage() {
           <thead className="sticky top-0 z-10 bg-gray-50">
             <tr>
               <SortableHeader label="Date" field="createdAt" />
-              <th className="p-2 border whitespace-nowrap">Products</th>
-              <th className="p-2 border whitespace-nowrap">#</th>
+              <th className="p-2 text-black border whitespace-nowrap">
+                Products
+              </th>
+              <th className="p-2 text-black border whitespace-nowrap">#</th>
               <SortableHeader label="Customer" field="shippingAddress.name" />
-              <th className="p-2 border whitespace-nowrap">Address</th>
-              <th className="p-2 border whitespace-nowrap">Phone</th>
+              <th className="p-2 text-black border whitespace-nowrap">
+                Address
+              </th>
+              <th className="p-2 text-black border whitespace-nowrap">Phone</th>
               <SortableHeader label="Total" field="total" />
               <SortableHeader label="Status" field="status" />
               <SortableHeader label="Payment" field="paymentStatus" />
@@ -309,13 +311,13 @@ export default function AdminOrdersPage() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={13} className="text-center p-4">
+                <td colSpan={13} className="text-center p-4 text-black">
                   Loading...
                 </td>
               </tr>
             ) : orders.length === 0 ? (
               <tr>
-                <td colSpan={13} className="text-center p-4">
+                <td colSpan={13} className="text-center p-4 text-black">
                   No orders found.
                 </td>
               </tr>
@@ -326,7 +328,7 @@ export default function AdminOrdersPage() {
                 return (
                   <tr
                     key={order._id}
-                    className="border-b hover:bg-blue-50 cursor-pointer transition group"
+                    className="border-b hover:bg-blue-50 cursor-pointer transition group text-black"
                     tabIndex={0}
                     onClick={rowClick}
                     onKeyDown={(e) => {
@@ -343,33 +345,43 @@ export default function AdminOrdersPage() {
                         hour12: true,
                       })}
                     </td>{" "}
-                    <td className="p-2 border max-w-[120px] md:max-w-xs truncate">
-                      {order.items &&
-                      order.items.length > 0 &&
-                      order.items[0]?.product?.name ? (
-                        order.items.length === 1 ? (
-                          order.items[0].product.name.length > 20 ? (
-                            <span title={order.items[0].product.name}>
-                              {order.items[0].product.name.slice(0, 20)}...
-                            </span>
-                          ) : (
-                            order.items[0].product.name
-                          )
+                    <td className="p-2 border max-w-[220px] md:max-w-xs">
+                      <ul className="space-y-1">
+                        {order.items && order.items.length > 0 ? (
+                          order.items.map((item, idx) => (
+                            <li key={idx} className="flex items-center gap-2">
+                              {item.product && item.product._id ? (
+                                <a
+                                  href={`/products/${item.product._id}`}
+                                  className="text-blue-700 font-semibold underline hover:text-blue-900 transition"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={e => e.stopPropagation()} // Prevent row click
+                                  title={item.product.name}
+                                >
+                                  {item.product.name.length > 28
+                                    ? item.product.name.slice(0, 28) + '...'
+                                    : item.product.name}
+                                </a>
+                              ) : (
+                                <span className="text-gray-700 font-semibold" title={item.name}>
+                                  {item.name && item.name.length > 28
+                                    ? item.name.slice(0, 28) + '...'
+                                    : item.name || '-'}
+                                </span>
+                              )}
+                              <span className="bg-gray-100 text-gray-800 rounded px-2 py-0.5 text-xs font-mono ml-1">
+                                x{item.quantity}
+                              </span>
+                              <span className="bg-green-50 text-green-700 rounded px-2 py-0.5 text-xs font-mono ml-1">
+                                ₹{item.price}
+                              </span>
+                            </li>
+                          ))
                         ) : (
-                          <span
-                            title={order.items
-                              .map((item) => item.product?.name || "")
-                              .join(", ")}
-                          >
-                            {(order.items[0].product.name.length > 20
-                              ? order.items[0].product.name.slice(0, 20) + "..."
-                              : order.items[0].product.name) +
-                              ` +${order.items.length - 1} more`}
-                          </span>
-                        )
-                      ) : (
-                        "-"
-                      )}
+                          <li>-</li>
+                        )}
+                      </ul>
                     </td>{" "}
                     <td className="p-2 border whitespace-nowrap text-center">
                       {order.items.length}
