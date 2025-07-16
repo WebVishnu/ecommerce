@@ -17,6 +17,7 @@ import {
   CheckCircle,
   Clock,
   Package,
+  AlertTriangle,
 } from "lucide-react";
 
 interface ShippingAddress {
@@ -131,8 +132,12 @@ function BuyNowCheckoutPageInner() {
       setSelectedAddressId(addressToUse._id || "0");
       setShippingAddress({
         ...addressToUse,
-        name: addressToUse.name == "" ? user.name || "" : addressToUse.name || "",
-        phone: addressToUse.phone == "" ? user.phone || "" : addressToUse.phone || "",
+        name:
+          addressToUse.name == "" ? user.name || "" : addressToUse.name || "",
+        phone:
+          addressToUse.phone == ""
+            ? user.phone || ""
+            : addressToUse.phone || "",
       });
     }
   }, [user]);
@@ -203,7 +208,7 @@ function BuyNowCheckoutPageInner() {
 
   // Function to use current location and autofill address
   const handleUseCurrentLocation = async () => {
-    if (typeof window === 'undefined' || !navigator.geolocation) {
+    if (typeof window === "undefined" || !navigator.geolocation) {
       setError("Geolocation is not supported by your browser");
       return;
     }
@@ -247,9 +252,9 @@ function BuyNowCheckoutPageInner() {
           setLocationLoading(false);
         }
       },
-      (error) => {
+      () => {
         setLocationLoading(false);
-        setError("Unable to retrieve your location");
+        setError("Unable to retrieve your location. Add Manually");
       }
     );
   };
@@ -274,6 +279,18 @@ function BuyNowCheckoutPageInner() {
         !shippingAddress.state ||
         !shippingAddress.pincode
       ) {
+        setShowNewAddressForm((v) => !v);
+        setNewAddress({
+          name: user?.name || "",
+          phone: user?.phone || "",
+          street: "",
+          city: "",
+          state: "",
+          pincode: "",
+          isDefault: false,
+          addressType: "home",
+          landmark: "",
+        });
         setError("Please select or add a shipping address.");
         return;
       }
@@ -336,17 +353,6 @@ function BuyNowCheckoutPageInner() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white text-black">
         Loading...
-      </div>
-    );
-  }
-  if (error && step !== "success") {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center text-center">
-        <div className="text-red-500 text-4xl mb-4">⚠️</div>
-        <div className="text-lg font-semibold mb-2">{error}</div>
-        <Link href="/" className="text-[#b91c1c] underline">
-          Back to Home
-        </Link>
       </div>
     );
   }
@@ -510,6 +516,9 @@ function BuyNowCheckoutPageInner() {
                 key={stepItem.key}
                 className="flex items-center cursor-pointer"
                 onClick={() => {
+                  if (step == "address" && !selectedAddressId) {
+                    return;
+                  }
                   if (step === stepItem.key) {
                     return;
                   }
@@ -563,11 +572,30 @@ function BuyNowCheckoutPageInner() {
                 </button>
                 <button
                   onClick={handleNextStep}
-                  className="bg-[#b91c1c] text-white px-6 py-2 rounded-md font-medium hover:bg-[#a31b1b] transition-colors"
+                  className="bg-[#b91c1c] text-white flex items-center gap-2 px-6 py-2 rounded-md font-medium hover:bg-[#a31b1b] transition-colors"
                 >
-                  Next
+                  {!selectedAddressId ||
+                  !shippingAddress.street ||
+                  !shippingAddress.city ||
+                  !shippingAddress.state ||
+                  !shippingAddress.pincode ? (
+                    <>
+                      <AlertTriangle className="w-4 h-4 text-yellow-500" />{" "}
+                      Address missing
+                    </>
+                  ) : (
+                    "Next"
+                  )}
                 </button>
               </div>
+              {error && (
+                <div
+                  onClick={() => setError(null)}
+                  className="text-lg border p-1 rounded-md border-red-500 font-semibold mb-2 text-red-500 cursor-pointer"
+                >
+                  ⚠️ {error}
+                </div>
+              )}
               <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
                 Shipping Address
               </h2>
