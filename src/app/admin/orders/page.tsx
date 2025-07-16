@@ -349,33 +349,46 @@ export default function AdminOrdersPage() {
                       <ul className="space-y-1">
                         {order.items && order.items.length > 0 ? (
                           order.items.map((item, idx) => (
-                            <li key={idx} className="flex items-center gap-2">
+                            <li key={idx} className="flex items-center gap-2 justify-between">
                               {item.product && item.product._id ? (
                                 <a
                                   href={`/products/${item.product._id}`}
-                                  className="text-blue-700 font-semibold underline hover:text-blue-900 transition"
+                                  className="line-clamp-2 text-blue-700 font-semibold underline hover:text-blue-900 transition"
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  onClick={e => e.stopPropagation()} // Prevent row click
+                                  onClick={(e) => e.stopPropagation()} // Prevent row click
                                   title={item.product.name}
+                                  style={{
+                                    display: "-webkit-box",
+                                    WebkitLineClamp: 2,
+                                    WebkitBoxOrient: "vertical",
+                                    overflow: "hidden",
+                                  }}
                                 >
-                                  {item.product.name.length > 28
-                                    ? item.product.name.slice(0, 28) + '...'
-                                    : item.product.name}
+                                  {item.product.name}
                                 </a>
                               ) : (
-                                <span className="text-gray-700 font-semibold" title={item.name}>
-                                  {item.name && item.name.length > 28
-                                    ? item.name.slice(0, 28) + '...'
-                                    : item.name || '-'}
+                                <span
+                                  className="line-clamp-2 text-gray-700 font-semibold"
+                                  style={{
+                                    display: "-webkit-box",
+                                    WebkitLineClamp: 2,
+                                    WebkitBoxOrient: "vertical",
+                                    overflow: "hidden",
+                                  }}
+                                  title={item.name}
+                                >
+                                  {item.name || "-"}
                                 </span>
                               )}
-                              <span className="bg-gray-100 text-gray-800 rounded px-2 py-0.5 text-xs font-mono ml-1">
-                                x{item.quantity}
-                              </span>
-                              <span className="bg-green-50 text-green-700 rounded px-2 py-0.5 text-xs font-mono ml-1">
-                                ₹{item.price}
-                              </span>
+                              <div>
+                                <span className="bg-gray-100 text-gray-800 rounded px-2 py-0.5 text-xs font-mono ml-1">
+                                  x{item.quantity}
+                                </span>
+                                <span className="bg-green-50 text-green-700 rounded px-2 py-0.5 text-xs font-mono ml-1">
+                                  ₹{item.price}
+                                </span>
+                              </div>
                             </li>
                           ))
                         ) : (

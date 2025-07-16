@@ -1,11 +1,12 @@
-const mongoose = require('mongoose');
+'use strict';
+var mongoose = require('mongoose');
 require('dotenv').config();
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/shivangi-battery');
 
 // Define the old User schema (for migration)
-const OldUserSchema = new mongoose.Schema({
+var OldUserSchema = new mongoose.Schema({
   name: String,
   email: String,
   phone: String,
@@ -21,10 +22,10 @@ const OldUserSchema = new mongoose.Schema({
   profileCompleted: Boolean
 }, { timestamps: true });
 
-const OldUser = mongoose.model('User', OldUserSchema);
+var OldUser = mongoose.model('User', OldUserSchema);
 
 // Define the new User schema
-const AddressSchema = new mongoose.Schema({
+var AddressSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -67,7 +68,7 @@ const AddressSchema = new mongoose.Schema({
   landmark: String
 });
 
-const NewUserSchema = new mongoose.Schema({
+var NewUserSchema = new mongoose.Schema({
   name: String,
   email: String,
   phone: String,
@@ -95,20 +96,20 @@ const NewUserSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-const NewUser = mongoose.model('NewUser', NewUserSchema);
+var NewUser = mongoose.model('NewUser', NewUserSchema);
 
 async function migrateAddresses() {
   try {
     console.log('Starting address migration...');
     
     // Get all users
-    const users = await OldUser.find({});
+    var users = await OldUser.find({});
     console.log(`Found ${users.length} users to migrate`);
     
-    let migratedCount = 0;
-    let skippedCount = 0;
+    var migratedCount = 0;
+    var skippedCount = 0;
     
-    for (const user of users) {
+    for (var user of users) {
       try {
         // Check if user already has addresses array
         if (user.addresses && Array.isArray(user.addresses)) {
@@ -118,14 +119,14 @@ async function migrateAddresses() {
         }
         
         // Create new user document with migrated data
-        const newUserData = {
+        var newUserData = {
           ...user.toObject(),
           addresses: []
         };
         
         // Migrate old address to new format if it exists
         if (user.address && (user.address.street || user.address.city || user.address.state || user.address.pincode)) {
-          const migratedAddress = {
+          var migratedAddress = {
             name: user.name || 'Default Address',
             phone: user.phone,
             street: user.address.street || '',

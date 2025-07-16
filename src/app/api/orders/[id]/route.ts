@@ -45,6 +45,7 @@ export async function GET(
       data: {
         order: {
           _id: order._id,
+          userId: order.user, // Add userId to the returned data
           items: order.items,
           subtotal: order.subtotal,
           tax: order.tax,

@@ -16,6 +16,7 @@ import {
   Phone,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { triggerPendingOrdersCountRefetch } from "@/components/AdminTopNav";
 
 // Toast notification component
 function Toast({
@@ -29,7 +30,7 @@ function Toast({
 }) {
   return (
     <div
-      className={`fixed top-6 right-6 z-50 px-6 py-3 rounded shadow-lg text-white flex items-center gap-2 ${
+      className={`fixed top-6 text-white right-6 z-50 px-6 py-3 rounded shadow-lg flex items-center gap-2 ${
         type === "success" ? "bg-green-600" : "bg-red-600"
       }`}
       role="alert"
@@ -40,7 +41,7 @@ function Toast({
       ) : (
         <XCircle className="w-5 h-5" />
       )}
-      <span>{message}</span>
+      <span className="text-white">{message}</span>
       <button
         onClick={onClose}
         className="ml-2 text-white/80 hover:text-white focus:outline-none"
@@ -174,8 +175,11 @@ export default function AdminOrderDetailsPage() {
         body: JSON.stringify({ paymentStatus: newStatus }),
       });
       if (!res.ok) throw new Error("Failed to update payment status");
-      await fetchOrder();
+      // Optimistically update order state
+      setOrder((prev: any) => ({ ...prev, paymentStatus: newStatus }));
       showToast("Payment status updated!", "success");
+      triggerPendingOrdersCountRefetch();
+      fetchOrder(true); // background sync
     } catch (err: unknown) {
       showToast(err instanceof Error ? err.message : "Unknown error", "error");
     } finally {
@@ -189,8 +193,8 @@ export default function AdminOrderDetailsPage() {
     setTimeout(() => setToast(null), 3500);
   }
 
-  async function fetchOrder() {
-    setLoading(true);
+  async function fetchOrder(background = false) {
+    if (!background) setLoading(true);
     setError("");
     try {
       const token = localStorage.getItem("authToken");
@@ -205,7 +209,7 @@ export default function AdminOrderDetailsPage() {
       if (err instanceof Error) setError(err.message);
       else setError("Unknown error");
     } finally {
-      setLoading(false);
+      if (!background) setLoading(false);
     }
   }
 
@@ -224,8 +228,10 @@ export default function AdminOrderDetailsPage() {
         body: JSON.stringify({ paymentStatus: "refunded" }),
       });
       if (!res.ok) throw new Error("Failed to mark as refunded");
-      await fetchOrder();
+      setOrder((prev: any) => ({ ...prev, paymentStatus: "refunded" }));
       showToast("Order marked as refunded!", "success");
+      triggerPendingOrdersCountRefetch();
+      fetchOrder(true); // background sync
     } catch (err: unknown) {
       showToast(err instanceof Error ? err.message : "Unknown error", "error");
     } finally {
@@ -245,8 +251,10 @@ export default function AdminOrderDetailsPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("Failed to cancel order");
-      await fetchOrder();
+      setOrder((prev: any) => ({ ...prev, status: "cancelled" }));
       showToast("Order cancelled!", "success");
+      triggerPendingOrdersCountRefetch();
+      fetchOrder(true); // background sync
     } catch (err: unknown) {
       showToast(err instanceof Error ? err.message : "Unknown error", "error");
     } finally {
@@ -452,16 +460,28 @@ export default function AdminOrderDetailsPage() {
                 <div className="flex items-center gap-2 text-gray-700">
                   <User2 className="w-5 h-5 text-blue-500" />
                   <span className="font-semibold">User:</span>
-                  <span className="truncate">
-                    {order.shippingAddress?.name ||
-                      order.shippingAddress?.email ||
-                      "-"}
+                  <span
+                    className={`truncate ${
+                      order.shippingAddress?.name
+                        ? "text-blue-500 underline"
+                        : "text-gray-500"
+                    }`}
+                    onClick={() =>
+                      router.push(`/admin/customers/${order.userId}`)
+                    }
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`View details for ${
+                      order.shippingAddress?.name || "User"
+                    }`}
+                  >
+                    {order.shippingAddress?.name || "-"}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-gray-700">
                   <Phone className="w-5 h-5 text-blue-500" />
                   <span className="font-semibold">Phone:</span>
-                  <span className="truncate" >
+                  <span className="truncate">
                     {order.shippingAddress?.phone || "-"}
                   </span>
                 </div>
@@ -538,17 +558,27 @@ export default function AdminOrderDetailsPage() {
               </div>
             )}
             {/* Call Customer Button */}
-            <div className="mt-8 flex fixed bottom-2 left-2 z-20">
+            <div className="mt-8 flex fixed bottom-2 left-2 z-20 md:hidden">
               <a
-                href={order.shippingAddress?.phone ? `tel:${order.shippingAddress.phone}` : undefined}
+                href={
+                  order.shippingAddress?.phone
+                    ? `tel:${order.shippingAddress.phone}`
+                    : undefined
+                }
                 className={`inline-flex items-center gap-2 px-4 py-2 rounded font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-                  ${order.shippingAddress?.phone ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                  ${
+                    order.shippingAddress?.phone
+                      ? "bg-[#b91c1c] text-white"
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  }`}
                 aria-label="Call Customer"
                 tabIndex={order.shippingAddress?.phone ? 0 : -1}
-                {...(!order.shippingAddress?.phone && { onClick: e => e.preventDefault() })}
+                {...(!order.shippingAddress?.phone && {
+                  onClick: (e) => e.preventDefault(),
+                })}
               >
                 <Phone className="w-5 h-5" />
-                Call Customer
+                +91 {order.shippingAddress?.phone}
               </a>
             </div>
             {/* Order Summary removed from here */}
@@ -706,7 +736,18 @@ export default function AdminOrderDetailsPage() {
                             }
                           }}
                         >
-                          {product?.name || "Product"}
+                          <span
+                            className="line-clamp-2 text-gray-700 font-semibold"
+                            style={{
+                              display: "-webkit-box",
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: "vertical",
+                              overflow: "hidden",
+                            }}
+                            title={item.name}
+                          >
+                            {item.name || "-"}
+                          </span>
                         </td>
                         <td className="px-3 py-2 text-gray-700 text-sm">
                           ₹{item.price}
@@ -724,23 +765,9 @@ export default function AdminOrderDetailsPage() {
               </table>
             </div>
             {/* Order Summary moved here */}
-            <div className="bg-gray-100 rounded-lg p-4 border border-gray-200 flex flex-col gap-2 max-w-xs ml-auto mt-8">
-              <div className="flex items-center justify-between text-gray-700">
-                <span className="font-semibold">Subtotal:</span>
-                <span>₹{order.subtotal}</span>
-              </div>
-              <div className="flex items-center justify-between text-gray-700">
-                <span className="font-semibold">Tax:</span>
-                <span>₹{order.tax}</span>
-              </div>
-              <div className="flex items-center justify-between text-gray-700">
-                <span className="font-semibold">Shipping:</span>
-                <span>₹{order.shipping}</span>
-              </div>
-              <div className="flex items-center justify-between text-lg font-bold text-black border-t border-gray-300 pt-2 mt-2">
-                <span>Total:</span>
-                <span>₹{order.total}</span>
-              </div>
+            <div className="flex items-center justify-end md:pb-0 pb-12 pt-6 px-6 text-lg font-bold border-gray-300">
+              <span className="font-normal">Total:&nbsp;</span>
+              <span>₹{order.total}</span>
             </div>
           </div>
         </div>
@@ -766,8 +793,10 @@ export default function AdminOrderDetailsPage() {
         return res.json();
       })
       .then(() => {
-        fetchOrder();
+        setOrder((prev: any) => ({ ...prev, status: newStatus }));
         showToast("Order status updated!", "success");
+        triggerPendingOrdersCountRefetch();
+        fetchOrder(true); // background sync
       })
       .catch((err) => {
         showToast(
