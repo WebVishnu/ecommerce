@@ -9,6 +9,7 @@ import {
   ShoppingCart,
   Menu,
   X,
+  RefreshCw,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -22,19 +23,43 @@ export default function AdminTopNav() {
   const { isAdmin } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [pendingCount, setPendingCount] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const fetchPendingCount = () => {
-    fetch("/api/orders/pending-count")
-      .then((res) => res.json())
-      .then((data) => setPendingCount(data.count))
-      .catch(() => setPendingCount(null));
+  const fetchPendingCount = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch("/api/orders/pending-count", {
+        method: "GET",
+        headers: {
+          "Cache-Control": "no-cache",
+          "Pragma": "no-cache"
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setPendingCount(data.count);
+    } catch (error) {
+      console.error("Failed to fetch pending count:", error);
+      setPendingCount(null);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
     fetchPendingCount();
     refetchPendingOrdersCount = fetchPendingCount;
+    
+    // Set up automatic refresh every 30 seconds
+    const interval = setInterval(fetchPendingCount, 30000);
+    
     return () => {
       refetchPendingOrdersCount = null;
+      clearInterval(interval);
     };
   }, []);
 
@@ -91,14 +116,22 @@ export default function AdminTopNav() {
               className="flex items-center space-x-1 text-gray-300 hover:text-white transition-colors relative"
             >
               {pendingCount !== null && pendingCount > 0 && (
-                <span className="ml-1 bg-red-600 text-white text-xs rounded-full px-2 py-0.5 font-bold">
+                <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full px-2 py-0.5 font-bold">
                   {pendingCount}
                 </span>
               )}
-              {pendingCount == null || pendingCount == 0 && (
-                <ShoppingCart className="w-4 h-4" />
-              )}
+              <ShoppingCart className="w-4 h-4" />
               <span className="text-white">Orders</span>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  fetchPendingCount();
+                }}
+                className="ml-1 p-1 hover:bg-gray-700 rounded transition-colors"
+                title="Refresh pending count"
+              >
+                <RefreshCw className={`w-3 h-3 ${isLoading ? 'animate-spin' : ''}`} />
+              </button>
             </Link>
 
             <Link
@@ -173,10 +206,18 @@ export default function AdminTopNav() {
                   {pendingCount}
                 </span>
               )}
-              {pendingCount == null || pendingCount == 0 && (
-                <ShoppingCart className="w-5 h-5" />
-              )}
+              <ShoppingCart className="w-5 h-5" />
               <span className="text-white">Orders</span>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  fetchPendingCount();
+                }}
+                className="ml-1 p-1 hover:bg-gray-700 rounded transition-colors"
+                title="Refresh pending count"
+              >
+                <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+              </button>
             </Link>
             <Link
               href="/admin/customers"

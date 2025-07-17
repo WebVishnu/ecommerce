@@ -8,11 +8,35 @@ if (!MONGODB_URI) {
 
 async function dbConnect() {
   try {
+    // If already connected, return the connection
     if (mongoose.connection.readyState === 1) {
       return mongoose.connection;
     }
 
-    await mongoose.connect(MONGODB_URI || "mongodb://localhost:27017/shivangi-battery");
+    // If connecting, wait for it to complete
+    if (mongoose.connection.readyState === 2) {
+      await new Promise((resolve) => {
+        mongoose.connection.once('connected', resolve);
+      });
+      return mongoose.connection;
+    }
+
+    // Connect to MongoDB
+    await mongoose.connect(MONGODB_URI!, {
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    });
+
+    // Set up connection event handlers
+    mongoose.connection.on('error', (err) => {
+      console.error('MongoDB connection error:', err);
+    });
+
+    mongoose.connection.on('disconnected', () => {
+      console.log('MongoDB disconnected');
+    });
+
     return mongoose.connection;
   } catch (error) {
     console.error('MongoDB connection error:', error);
