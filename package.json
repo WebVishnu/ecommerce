@@ -13,7 +13,6 @@
     "@apollo/client": "^3.8.8",
     "@google-cloud/storage": "^7.16.0",
     "@headlessui/react": "^2.2.4",
-    "@msg91comm/sendotp-react-native": "^2.0.2",
     "@types/bcryptjs": "^3.0.0",
     "@types/cors": "^2.8.19",
     "@types/dompurify": "^3.2.0",
