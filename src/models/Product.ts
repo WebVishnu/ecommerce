@@ -25,16 +25,16 @@ export interface IProduct {
 const ProductSchema = new Schema<IProduct>({
   name: {
     type: String,
-    required: true,
+    required: function(this: any) { return !this.isDraft || this.name; },
     trim: true
   },
   description: {
     type: String,
-    required: true
+    required: function(this: any) { return !this.isDraft; },
   },
   price: {
     type: Number,
-    required: true,
+    required: function(this: any) { return !this.isDraft; },
     min: 0
   },
   originalPrice: {
@@ -43,11 +43,11 @@ const ProductSchema = new Schema<IProduct>({
   },
   category: {
     type: String,
-    required: true
+    required: function(this: any) { return !this.isDraft; },
   },
   brand: {
     type: String,
-    required: true,
+    required: function(this: any) { return !this.isDraft; },
     trim: true
   },
   model: {
@@ -56,13 +56,13 @@ const ProductSchema = new Schema<IProduct>({
   },
   stock: {
     type: Number,
-    required: true,
+    required: function(this: any) { return !this.isDraft; },
     min: 0,
     default: 0
   },
   images: [{
     type: String,
-    required: true
+    required: function(this: any) { return !this.isDraft; }
   }],
   specifications: {
     type: Map,

@@ -212,10 +212,10 @@ export default function AdminOrdersPage() {
             <span>Avg Order</span>
           </div>
           {analytics.mostPurchasedProduct && (
-            <div className="bg-gray-50 rounded px-3 py-2 flex flex-col items-center min-w-[120px]">
+            <div className="bg-gray-50 rounded px-3 py-2 flex flex-col items-center min-w-[120px] cursor-pointer" onClick={() => router.push(`/products/${analytics.mostPurchasedProduct?.productId}`)}>
               <span
                 className="font-bold text-xs truncate max-w-[100px]"
-                title={analytics.mostPurchasedProduct.name}
+                title={analytics.mostPurchasedProduct?.name}
               >
                 <span className="text-blue-700 font-bold">
                   {" "}
@@ -227,7 +227,7 @@ export default function AdminOrdersPage() {
             </div>
           )}
           {analytics.topCustomer && (
-            <div className="bg-gray-50 rounded px-3 py-2 flex flex-col items-center min-w-[120px]">
+            <div className="bg-gray-50 rounded px-3 py-2 flex flex-col items-center min-w-[120px] cursor-pointer" onClick={() => router.push(`/admin/customers/${analytics.topCustomer?.userId}`)}>
               <span
                 className="font-bold text-xs truncate max-w-[100px]"
                 title={analytics.topCustomer.email}

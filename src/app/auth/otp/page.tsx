@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import Head from "next/head";
 
 export default function OtpAuthPage() {
   const [step, setStep] = useState<"mobile" | "otp">("mobile");
@@ -45,6 +46,7 @@ export default function OtpAuthPage() {
       setPendingRedirect(null);
     }
   }, [isAuthenticated, user, pendingRedirect, router]);
+
 
   // Cleanup countdown timer on unmount
   useEffect(() => {
@@ -96,14 +98,14 @@ export default function OtpAuthPage() {
       const resendTime = data.expiresIn
         ? Math.min(data.expiresIn - 180, 120)
         : 120; // 3 minutes before OTP expires, max 2 minutes
-      
+
       setCountdown(resendTime);
-      
+
       // Clear any existing timer
       if (countdownTimerRef.current) {
         clearInterval(countdownTimerRef.current);
       }
-      
+
       countdownTimerRef.current = setInterval(() => {
         setCountdown((prev) => {
           if (prev <= 1) {
@@ -164,7 +166,6 @@ export default function OtpAuthPage() {
     setLoading(true);
 
     try {
-      
       const res = await fetch("/api/auth/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -184,14 +185,14 @@ export default function OtpAuthPage() {
       const resendTime = data.expiresIn
         ? Math.min(data.expiresIn - 180, 120)
         : 120; // 3 minutes before OTP expires, max 2 minutes
-      
+
       setCountdown(resendTime);
-      
+
       // Clear any existing timer
       if (countdownTimerRef.current) {
         clearInterval(countdownTimerRef.current);
       }
-      
+
       countdownTimerRef.current = setInterval(() => {
         setCountdown((prev) => {
           if (prev <= 1) {
@@ -205,7 +206,7 @@ export default function OtpAuthPage() {
         });
       }, 1000);
     } catch (err: unknown) {
-      console.error('❌ Resend OTP error:', err);
+      console.error("❌ Resend OTP error:", err);
       setError(err instanceof Error ? err.message : "Failed to resend OTP");
     } finally {
       setLoading(false);
@@ -220,6 +221,9 @@ export default function OtpAuthPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <Head>
+        <script src="https://widget.msg91.com/otp/v2/widget.min.js"></script>
+      </Head>
       <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
         <h1 className="text-2xl font-bold mb-6 text-center text-gray-900">
           {step === "mobile" ? "Sign In / Register" : "Verify OTP"}
@@ -295,7 +299,8 @@ export default function OtpAuthPage() {
                 autoFocus
               />
             </div>
-
+            {/* MSG91 OTP Widget */}
+            <div id="otp_widget" className="my-4"></div>
             <button
               type="submit"
               disabled={loading || otp.length !== 4}

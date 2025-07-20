@@ -31,14 +31,6 @@ export async function POST(request: NextRequest) {
     
     const body = await request.json();
     
-    // Validate required fields for draft
-    if (!body.name || !body.category || !body.brand || !body.model) {
-      return NextResponse.json(
-        { success: false, message: 'Name, category, brand, and model are required for drafts' },
-        { status: 400 }
-      );
-    }
-
     const draftData = {
       ...body,
       isDraft: true,
@@ -91,6 +83,7 @@ export async function PUT(request: NextRequest) {
     
     const updateData = {
       ...body,
+      isDraft: true, // Ensure isDraft is set so description is not required
       draftSavedAt: new Date()
     };
 

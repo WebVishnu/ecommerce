@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   Search,
@@ -62,11 +62,14 @@ const CATEGORIES = [
 function SearchPageInner() {
   const { isAdmin } = useAuth();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const query = searchParams.get('q') || '';
   const category = searchParams.get('category') || '';
   const brand = searchParams.get('brand') || '';
 
+  // Debounced search state
   const [searchQuery, setSearchQuery] = useState(query);
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(query);
   const [selectedCategory, setSelectedCategory] = useState(category);
   const [selectedBrand, setSelectedBrand] = useState(brand);
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });
@@ -87,12 +90,60 @@ function SearchPageInner() {
   });
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
+  // Debounce search input
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
+
   // Sync state with URL parameters when they change
   useEffect(() => {
     setSearchQuery(query);
+    setDebouncedSearchQuery(query);
     setSelectedCategory(category);
     setSelectedBrand(brand);
+    setPagination((prev) => ({ ...prev, page: 1 }));
   }, [query, category, brand]);
+
+  // Update URL when filters/search/pagination change
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (debouncedSearchQuery) params.set('q', debouncedSearchQuery);
+    if (selectedCategory) params.set('category', selectedCategory);
+    if (selectedBrand) params.set('brand', selectedBrand);
+    if (priceRange.min) params.set('min', priceRange.min);
+    if (priceRange.max) params.set('max', priceRange.max);
+    if (pagination.page > 1) params.set('page', String(pagination.page));
+    router.push(`/search?${params.toString()}`);
+  }, [debouncedSearchQuery, selectedCategory, selectedBrand, priceRange.min, priceRange.max, pagination.page, router]);
+
+  // Reset page to 1 when filters/search/price change
+  const prevFilters = useRef({
+    debouncedSearchQuery: debouncedSearchQuery,
+    selectedCategory: selectedCategory,
+    selectedBrand: selectedBrand,
+    priceRange: { ...priceRange },
+  });
+  useEffect(() => {
+    const prev = prevFilters.current;
+    if (
+      prev.debouncedSearchQuery !== debouncedSearchQuery ||
+      prev.selectedCategory !== selectedCategory ||
+      prev.selectedBrand !== selectedBrand ||
+      prev.priceRange.min !== priceRange.min ||
+      prev.priceRange.max !== priceRange.max
+    ) {
+      setPagination((prev) => ({ ...prev, page: 1 }));
+    }
+    prevFilters.current = {
+      debouncedSearchQuery,
+      selectedCategory,
+      selectedBrand,
+      priceRange: { ...priceRange },
+    };
+  }, [debouncedSearchQuery, selectedCategory, selectedBrand, priceRange.min, priceRange.max]);
 
   // Fetch products from API
   useEffect(() => {
@@ -114,14 +165,13 @@ function SearchPageInner() {
           limit: 12,
         };
 
-        if (searchQuery) params.search = searchQuery;
+        if (debouncedSearchQuery) params.search = debouncedSearchQuery;
         if (selectedCategory) params.category = selectedCategory.toLowerCase();
         if (selectedBrand) params.brand = selectedBrand;
         if (priceRange.min) params.minPrice = parseInt(priceRange.min);
         if (priceRange.max) params.maxPrice = parseInt(priceRange.max);
 
         const response = await productAPI.getAll(params);
-        
         setProducts(response.data.products);
         setPagination({
           page: response.data.pagination.page,
@@ -139,7 +189,7 @@ function SearchPageInner() {
     };
 
     fetchProducts();
-  }, [searchQuery, selectedCategory, selectedBrand, priceRange, pagination.page]);
+  }, [debouncedSearchQuery, selectedCategory, selectedBrand, priceRange, pagination.page]);
 
   const handleAddToCart = (product: Product) => {
   };
@@ -179,7 +229,10 @@ function SearchPageInner() {
             {CATEGORIES.map((cat) => (
               <button
                 key={cat.name}
-                onClick={() => setSelectedCategory(selectedCategory === cat.name ? '' : cat.name)}
+                onClick={() => {
+                  setSelectedCategory(selectedCategory === cat.name ? '' : cat.name);
+                  setPagination(prev => ({ ...prev, page: 1 }));
+                }}
                 className={`flex items-center gap-2 w-full text-left p-2 rounded-md transition-colors ${
                   selectedCategory === cat.name
                     ? 'bg-[#b91c1c] text-white'
@@ -212,7 +265,10 @@ function SearchPageInner() {
             {INDIAN_BATTERY_BRANDS.map((brandItem) => (
               <button
                 key={brandItem.name}
-                onClick={() => setSelectedBrand(selectedBrand === brandItem.name ? '' : brandItem.name)}
+                onClick={() => {
+                  setSelectedBrand(selectedBrand === brandItem.name ? '' : brandItem.name);
+                  setPagination(prev => ({ ...prev, page: 1 }));
+                }}
                 className={`flex items-center gap-2 w-full text-left p-2 rounded-md transition-colors ${
                   selectedBrand === brandItem.name
                     ? 'bg-[#b91c1c] text-white'
@@ -247,7 +303,10 @@ function SearchPageInner() {
                 type="number"
                 placeholder="0"
                 value={priceRange.min}
-                onChange={(e) => setPriceRange(prev => ({ ...prev, min: e.target.value }))}
+                onChange={(e) => {
+                  setPriceRange(prev => ({ ...prev, min: e.target.value }));
+                  setPagination(prev => ({ ...prev, page: 1 }));
+                }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#b91c1c]"
               />
             </div>
@@ -257,7 +316,10 @@ function SearchPageInner() {
                 type="number"
                 placeholder="50000"
                 value={priceRange.max}
-                onChange={(e) => setPriceRange(prev => ({ ...prev, max: e.target.value }))}
+                onChange={(e) => {
+                  setPriceRange(prev => ({ ...prev, max: e.target.value }));
+                  setPagination(prev => ({ ...prev, page: 1 }));
+                }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#b91c1c]"
               />
             </div>

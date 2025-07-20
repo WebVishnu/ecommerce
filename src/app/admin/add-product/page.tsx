@@ -21,6 +21,7 @@ import {
 import Image from "next/image";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "react-quill/dist/quill.snow.css";
+import { Combobox } from "@headlessui/react";
 
 interface ProductFormData {
   name: string;
@@ -31,14 +32,17 @@ interface ProductFormData {
   brand: string;
   model: string;
   stock: number;
-  images: string[];
+  images: { url: string; fileId: string }[];
   specifications: Record<string, string>;
   isActive: boolean;
   isFeatured: boolean;
+  lastSaved?: number; // timestamp
+  userId?: string;
 }
 
 const DEFAULT_CATEGORIES = [
   { value: "automotive", label: "Automotive" },
+  { value: "power", label: "Power" },
   { value: "inverter", label: "Inverter" },
   { value: "solar", label: "Solar" },
   { value: "ups", label: "UPS" },
@@ -79,7 +83,7 @@ const quillFormats = [
 function AddProductPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isAdmin, loading: authLoading } = useAuth();
+  const { isAdmin, loading: authLoading, user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -89,6 +93,29 @@ function AddProductPageInner() {
   const [categoryInput, setCategoryInput] = useState("");
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const categoryInputRef = useRef<HTMLInputElement>(null);
+  const [categoryQuery, setCategoryQuery] = useState("");
+  const filteredCategories =
+    categoryQuery === ""
+      ? categories
+      : categories.filter((cat) =>
+          cat.label.toLowerCase().includes(categoryQuery.toLowerCase())
+        );
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const [draftPrompt, setDraftPrompt] = useState<null | {
+    local: ProductFormData;
+    remote: ProductFormData;
+  }>(null);
+  const autoSaveTimeout = useRef<NodeJS.Timeout | null>(null);
+  const [saveStatus, setSaveStatus] = useState<
+    "idle" | "saving" | "saved" | "error"
+  >("idle");
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [lastSavedTime, setLastSavedTime] = useState<number | null>(null);
+  const [draftError, setDraftError] = useState<string | null>(null);
+  const [showDraftLoadedModal, setShowDraftLoadedModal] = useState(false);
+  const [draftLoadedType, setDraftLoadedType] = useState<
+    null | "local" | "remote"
+  >(null);
 
   const [formData, setFormData] = useState<ProductFormData>({
     name: "",
@@ -108,30 +135,62 @@ function AddProductPageInner() {
   const [newSpecKey, setNewSpecKey] = useState("");
   const [newSpecValue, setNewSpecValue] = useState("");
 
-  // Load draft or product from URL parameter
-  useEffect(() => {
-    const draftParam = searchParams.get("draft");
-    const editParam = searchParams.get("edit");
-
-    if (draftParam) {
-      loadDraftFromDatabase(draftParam);
-    } else if (editParam) {
-      loadProductForEdit(editParam);
-    } else {
-      loadFromLocalStorage();
-    }
-  }, [searchParams]);
-
   // Auto-save functionality
-  useEffect(() => {
-    if (hasUnsavedChanges) {
-      const autoSaveTimer = setTimeout(() => {
-        saveDraft();
-      }, AUTO_SAVE_INTERVAL);
+  const saveDraft = async () => {
+    try {
+      setLoading(true);
+      setSaveStatus("saving");
+      setSaveError(null);
 
-      return () => clearTimeout(autoSaveTimer);
+      // Save to localStorage first
+      const draftToSave = { ...formData, userId: user?._id };
+      saveToLocalStorage(draftToSave);
+
+      // Save to database
+      const url = draftId
+        ? `/api/products/drafts?id=${draftId}`
+        : "/api/products/drafts";
+
+      const method = draftId ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(draftToSave),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        if (!draftId) {
+          setDraftId(data.data.draft._id);
+        }
+        setHasUnsavedChanges(false);
+        setSaveStatus("saved");
+        setLastSavedTime(Date.now());
+      } else {
+        setSaveStatus("error");
+        setSaveError(data.message || "Failed to save draft");
+        console.error("Failed to save draft:", data.message);
+      }
+    } catch (error: any) {
+      setSaveStatus("error");
+      setSaveError(error?.message || "Error saving draft");
+      console.error("Error saving draft:", error);
+    } finally {
+      setLoading(false);
+      setTimeout(() => setSaveStatus("idle"), 2000);
     }
-  }, [formData, hasUnsavedChanges]);
+  };
+
+  const debouncedSaveDraft = useCallback(() => {
+    if (autoSaveTimeout.current) clearTimeout(autoSaveTimeout.current);
+    autoSaveTimeout.current = setTimeout(() => {
+      saveDraft();
+    }, 2000); // 2 seconds debounce
+  }, [formData, saveDraft, user]);
 
   // Page unload protection
   useEffect(() => {
@@ -145,13 +204,72 @@ function AddProductPageInner() {
       };
 
       window.addEventListener("beforeunload", handleBeforeUnload);
-      return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+      return () =>
+        window.removeEventListener("beforeunload", handleBeforeUnload);
     }
   }, [hasUnsavedChanges]);
 
+  // On mount, compare local and remote drafts
+  useEffect(() => {
+    const draftParam = searchParams.get("draft");
+    const editParam = searchParams.get("edit");
+
+    async function checkDrafts() {
+      let localDraft = loadFromLocalStorage();
+      let remoteDraft = null;
+      if (draftParam) {
+        remoteDraft = await loadDraftFromDatabase(draftParam, true);
+      }
+      // If userId is present, only restore if it matches current user
+      const currentUserId = user?._id;
+      if (
+        localDraft &&
+        localDraft.userId &&
+        localDraft.userId !== currentUserId
+      ) {
+        localDraft = null;
+      }
+      if (
+        remoteDraft &&
+        remoteDraft.userId &&
+        remoteDraft.userId !== currentUserId
+      ) {
+        remoteDraft = null;
+      }
+      if (localDraft && remoteDraft) {
+        // Compare lastSaved timestamps
+        if ((localDraft.lastSaved || 0) !== (remoteDraft.lastSaved || 0)) {
+          setDraftPrompt({ local: localDraft, remote: remoteDraft });
+          return;
+        }
+      }
+      if (localDraft && !remoteDraft) {
+        setShowDraftLoadedModal(true);
+        setDraftLoadedType("local");
+        setFormData(localDraft);
+        setHasUnsavedChanges(true);
+      } else if (!localDraft && remoteDraft) {
+        setShowDraftLoadedModal(true);
+        setDraftLoadedType("remote");
+        setFormData(remoteDraft);
+        setHasUnsavedChanges(false);
+      } else if (!draftParam && !editParam) {
+        // fallback to local storage if no draft param
+        if (localDraft) {
+          setShowDraftLoadedModal(true);
+          setDraftLoadedType("local");
+          setFormData(localDraft);
+          setHasUnsavedChanges(true);
+        }
+      }
+    }
+    if (!authLoading) checkDrafts();
+  }, [searchParams, user, authLoading]);
+
   const saveToLocalStorage = useCallback((data: ProductFormData) => {
     try {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+      const toSave = { ...data, lastSaved: Date.now() };
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(toSave));
     } catch (error) {
       console.error("Error saving to localStorage:", error);
     }
@@ -162,12 +280,12 @@ function AddProductPageInner() {
       const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        setFormData(parsed);
-        setHasUnsavedChanges(true);
+        return parsed;
       }
     } catch (error) {
       console.error("Error loading from localStorage:", error);
     }
+    return null;
   };
 
   // Redirect if not admin
@@ -208,15 +326,16 @@ function AddProductPageInner() {
     }
   };
 
-  const loadDraftFromDatabase = async (draftId: string) => {
+  const loadDraftFromDatabase = async (draftId: string, returnOnly = false) => {
     try {
       setLoading(true);
+      setDraftError(null);
       const response = await fetch(`/api/products/${draftId}`);
+      if (!response.ok) throw new Error("Failed to fetch draft from server");
       const data = await response.json();
-
       if (data.success && data.data.product.isDraft) {
         const draft = data.data.product;
-        setFormData({
+        const draftData: ProductFormData = {
           name: draft.name || "",
           description: draft.description || "",
           price: draft.price || 0,
@@ -229,54 +348,24 @@ function AddProductPageInner() {
           specifications: draft.specifications || {},
           isActive: draft.isActive !== undefined ? draft.isActive : true,
           isFeatured: draft.isFeatured || false,
-        });
+          lastSaved: draft.lastSaved || 0,
+          userId: draft.userId,
+        };
+        if (returnOnly) return draftData;
+        setFormData(draftData);
         setDraftId(draftId);
         setHasUnsavedChanges(false);
+        return draftData;
+      } else {
+        setDraftError(data.message || "Draft not found or not a draft");
       }
-    } catch (error) {
+    } catch (error: any) {
+      setDraftError(error?.message || "Error loading draft");
       console.error("Error loading draft:", error);
     } finally {
       setLoading(false);
     }
-  };
-
-  const saveDraft = async () => {
-    try {
-      setLoading(true);
-
-      // Save to localStorage first
-      saveToLocalStorage(formData);
-
-      // Save to database
-      const url = draftId
-        ? `/api/products/drafts?id=${draftId}`
-        : "/api/products/drafts";
-
-      const method = draftId ? "PUT" : "POST";
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        if (!draftId) {
-          setDraftId(data.data.draft._id);
-        }
-        setHasUnsavedChanges(false);
-      } else {
-        console.error("Failed to save draft:", data.message);
-      }
-    } catch (error) {
-      console.error("Error saving draft:", error);
-    } finally {
-      setLoading(false);
-    }
+    return null;
   };
 
   const clearLocalStorage = () => {
@@ -293,12 +382,13 @@ function AddProductPageInner() {
       [field]: value,
     }));
     setHasUnsavedChanges(true);
+    debouncedSaveDraft(); // Save immediately on major field changes
   };
 
   const handleImageUpload = async (files: FileList) => {
     setUploading(true);
     try {
-      const uploadedUrls: string[] = [];
+      const uploadedUrls: { url: string; fileId: string }[] = [];
 
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
@@ -317,7 +407,8 @@ function AddProductPageInner() {
 
         if (response.ok) {
           const data = await response.json();
-          uploadedUrls.push(data.url);
+          // Store both url and fileId
+          uploadedUrls.push({ url: data.url, fileId: data.fileId });
         } else {
           console.error(`Failed to upload ${file.name}`);
         }
@@ -328,6 +419,7 @@ function AddProductPageInner() {
         images: [...prev.images, ...uploadedUrls],
       }));
       setHasUnsavedChanges(true);
+      debouncedSaveDraft(); // Save immediately after image upload
     } catch (error) {
       console.error("Error uploading images:", error);
     } finally {
@@ -335,12 +427,25 @@ function AddProductPageInner() {
     }
   };
 
-  const handleImageRemove = (index: number) => {
+  const handleImageRemove = async (index: number) => {
+    const image = formData.images[index];
+    if (image && image.fileId) {
+      try {
+        await fetch("/api/upload", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fileId: image.fileId }),
+        });
+      } catch (err) {
+        console.error("Failed to delete image from ImageKit", err);
+      }
+    }
     setFormData((prev) => ({
       ...prev,
       images: prev.images.filter((_, i) => i !== index),
     }));
     setHasUnsavedChanges(true);
+    debouncedSaveDraft(); // Save immediately after image removal
   };
 
   const handleSpecificationAdd = () => {
@@ -355,6 +460,7 @@ function AddProductPageInner() {
       setNewSpecKey("");
       setNewSpecValue("");
       setHasUnsavedChanges(true);
+      debouncedSaveDraft(); // Save immediately after spec add
     }
   };
 
@@ -368,6 +474,7 @@ function AddProductPageInner() {
       };
     });
     setHasUnsavedChanges(true);
+    debouncedSaveDraft(); // Save immediately after spec remove
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -426,11 +533,6 @@ function AddProductPageInner() {
     return new Date(dateString).toLocaleTimeString();
   };
 
-  // Filtered categories for dropdown
-  const filteredCategories = categories.filter((cat) =>
-    cat.label.toLowerCase().includes(categoryInput.toLowerCase())
-  );
-
   // Handle category selection
   const handleCategorySelect = (cat: { value: string; label: string }) => {
     setFormData((prev) => ({ ...prev, category: cat.value }));
@@ -458,6 +560,49 @@ function AddProductPageInner() {
     setCategoryInput(selected ? selected.label : formData.category);
   }, [formData.category, categories]);
 
+  const  discardDraft = async () => {
+    if (
+      !window.confirm(
+        "Are you sure you want to discard this draft? This cannot be undone."
+      )
+    )
+      return;
+    try {
+      setDraftError(null);
+      clearLocalStorage();
+      if (draftId) {
+        const res = await fetch(`/api/products/${draftId}`, {
+          method: "DELETE",
+        });
+        if (!res.ok) throw new Error("Failed to delete server draft");
+      }
+      setFormData({
+        name: "",
+        description: "",
+        price: 0,
+        originalPrice: undefined,
+        category: "automotive",
+        brand: "",
+        model: "",
+        stock: 0,
+        images: [],
+        specifications: {},
+        isActive: true,
+        isFeatured: false,
+        lastSaved: undefined,
+        userId: user?._id,
+      });
+      setDraftId(null);
+      setHasUnsavedChanges(false);
+      alert("Draft discarded successfully.");
+    } catch (err: any) {
+      setDraftError(
+        err?.message || "Failed to discard draft. Please try again."
+      );
+      alert("Failed to discard draft. Please try again.");
+    }
+  };
+
   if (success) {
     const isEditing = searchParams.get("edit");
     return (
@@ -476,9 +621,34 @@ function AddProductPageInner() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-6">
+      <div
+        className="sr-only"
+        aria-live="polite"
+        id="form-feedback-live-region"
+      ></div>
       <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-8"
+          aria-labelledby="add-product-form-title"
+        >
+          <div className="mb-2">
+            {draftError && <div className="text-red-600">{draftError}</div>}
+          </div>
+          <div className="mb-4">
+            {saveStatus === "saving" && (
+              <div className="text-blue-600">Saving draft...</div>
+            )}
+            {lastSavedTime && (
+              <div className="text-green-600">
+                Draft saved at {new Date(lastSavedTime).toLocaleTimeString()}
+              </div>
+            )}
+            {saveStatus === "error" && saveError && (
+              <div className="text-red-600">{saveError}</div>
+            )}
+          </div>
           <div className="sm:bg-white rounded-lg sm:shadow-md sm:p-6 p-1">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Left Column */}
@@ -487,10 +657,14 @@ function AddProductPageInner() {
                 <div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label
+                        htmlFor="product-name"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
                         Product Name *
                       </label>
                       <input
+                        id="product-name"
                         type="text"
                         required
                         value={formData.name}
@@ -499,77 +673,81 @@ function AddProductPageInner() {
                         }
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#b91c1c] focus:border-transparent"
                         placeholder="Enter product name"
+                        aria-required="true"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label
+                        htmlFor="category-combobox"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
                         Category *
                       </label>
-                      <div className="relative">
-                        <input
-                          ref={categoryInputRef}
-                          type="text"
-                          required
-                          value={categoryInput}
-                          onChange={(e) => {
-                            setCategoryInput(e.target.value);
-                            setShowCategoryDropdown(true);
-                          }}
-                          onFocus={() => setShowCategoryDropdown(true)}
-                          onBlur={() =>
-                            setTimeout(
-                              () => setShowCategoryDropdown(false),
-                              150
-                            )
-                          }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#b91c1c] focus:border-transparent"
-                          placeholder="Select or create category"
-                        />
-                        {showCategoryDropdown && (
-                          <div className="absolute z-10 left-0 right-0 bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-48 overflow-auto">
-                            {filteredCategories.length > 0 ? (
+                      <Combobox
+                        value={formData.category as string}
+                        onChange={(value: string) => {
+                          handleInputChange("category", value);
+                          setCategoryQuery("");
+                        }}
+                      >
+                        <div className="relative">
+                          <Combobox.Input
+                            id="category-combobox"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#b91c1c] focus:border-transparent"
+                            displayValue={(value: string) => {
+                              const found = categories.find(
+                                (c) => c.value === value
+                              );
+                              return found ? found.label : value;
+                            }}
+                            onChange={(e) => setCategoryQuery(e.target.value)}
+                            aria-autocomplete="list"
+                            aria-controls="category-listbox"
+                            aria-required="true"
+                            placeholder="Select or create category"
+                          />
+                          <Combobox.Options
+                            className="absolute z-10 left-0 right-0 bg-white text-black border border-gray-200 rounded-md shadow-lg mt-1 max-h-48 overflow-auto"
+                            id="category-listbox"
+                          >
+                            {filteredCategories.length === 0 &&
+                            categoryQuery !== "" ? (
+                              <Combobox.Option
+                                value={categoryQuery}
+                                className="px-4 py-2 cursor-pointer text-[#b91c1c] hover:bg-gray-50"
+                              >
+                                + Create "{categoryQuery}"
+                              </Combobox.Option>
+                            ) : (
                               filteredCategories.map((cat) => (
-                                <div
+                                <Combobox.Option
                                   key={cat.value}
-                                  className={`px-4 py-2 cursor-pointer text-gray-700 hover:bg-gray-100 ${
-                                    formData.category === cat.value
-                                      ? "bg-gray-100"
-                                      : ""
-                                  }`}
-                                  onMouseDown={() => handleCategorySelect(cat)}
+                                  value={cat.value}
+                                  className={({ active }) =>
+                                    `px-4 py-2 cursor-pointer ${
+                                      active ? "bg-gray-100" : ""
+                                    }`
+                                  }
                                 >
                                   {cat.label}
-                                </div>
+                                </Combobox.Option>
                               ))
-                            ) : (
-                              <div className="px-4 py-2 text-gray-500">
-                                No categories found
-                              </div>
                             )}
-                            {categoryInput.trim() &&
-                              !categories.some(
-                                (c) =>
-                                  c.label.toLowerCase() ===
-                                  categoryInput.trim().toLowerCase()
-                              ) && (
-                                <div
-                                  className="px-4 py-2 cursor-pointer text-[#b91c1c] hover:bg-gray-50 border-t border-gray-100"
-                                  onMouseDown={handleCreateCategory}
-                                >
-                                  + Create "{categoryInput.trim()}"
-                                </div>
-                              )}
-                          </div>
-                        )}
-                      </div>
+                          </Combobox.Options>
+                        </div>
+                      </Combobox>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label
+                        htmlFor="brand"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
                         Brand *
                       </label>
                       <input
+                        id="brand"
                         type="text"
                         required
                         value={formData.brand}
@@ -578,14 +756,19 @@ function AddProductPageInner() {
                         }
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#b91c1c] focus:border-transparent"
                         placeholder="Enter brand name"
+                        aria-required="true"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label
+                        htmlFor="stock"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
                         Stock *
                       </label>
                       <input
+                        id="stock"
                         type="number"
                         required
                         min="0"
@@ -604,6 +787,7 @@ function AddProductPageInner() {
                         }}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#b91c1c] focus:border-transparent"
                         placeholder="0"
+                        aria-required="true"
                       />
                     </div>
                   </div>
@@ -611,11 +795,15 @@ function AddProductPageInner() {
 
                 {/* Description */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="description"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Description *
                   </label>
                   <div className="border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-[#b91c1c] focus-within:border-transparent">
                     <ReactQuill
+                      id="description"
                       theme="snow"
                       value={formData.description}
                       onChange={(value) =>
@@ -646,6 +834,8 @@ function AddProductPageInner() {
                     {/* Upload Button */}
                     <div className="space-y-2">
                       <input
+                        ref={imageInputRef}
+                        id="product-images"
                         type="file"
                         multiple
                         accept="image/*"
@@ -653,12 +843,14 @@ function AddProductPageInner() {
                           e.target.files && handleImageUpload(e.target.files)
                         }
                         className="hidden"
+                        aria-label="Upload product images"
                       />
                       <button
                         type="button"
-                        onClick={() => categoryInputRef.current?.click()}
+                        onClick={() => imageInputRef.current?.click()}
                         disabled={uploading}
                         className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-md text-gray-600 hover:border-[#b91c1c] hover:text-[#b91c1c] transition-colors disabled:opacity-50"
+                        aria-describedby="product-images-help"
                       >
                         {uploading ? (
                           <Loader2 className="w-5 h-5 animate-spin" />
@@ -667,7 +859,10 @@ function AddProductPageInner() {
                         )}
                         {uploading ? "Uploading..." : "Upload Images"}
                       </button>
-                      <p className="text-xs text-gray-500 text-center">
+                      <p
+                        id="product-images-help"
+                        className="text-xs text-gray-500 text-center"
+                      >
                         Maximum 5 images, 5MB each. Supported formats: JPG, PNG,
                         WebP
                       </p>
@@ -680,7 +875,9 @@ function AddProductPageInner() {
                           <div key={index} className="relative group">
                             <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
                               <Image
-                                src={image}
+                                src={
+                                  typeof image === "string" ? image : image.url
+                                }
                                 alt={`Product image ${index + 1}`}
                                 width={200}
                                 height={200}
@@ -691,6 +888,7 @@ function AddProductPageInner() {
                               type="button"
                               onClick={() => handleImageRemove(index)}
                               className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                              aria-label={`Remove image ${index + 1}`}
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -703,10 +901,14 @@ function AddProductPageInner() {
                 <div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label
+                        htmlFor="price"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
                         Price (₹) *
                       </label>
                       <input
+                        id="price"
                         type="number"
                         required
                         min="0"
@@ -724,10 +926,14 @@ function AddProductPageInner() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label
+                        htmlFor="original-price"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
                         Original Price (₹) - Optional
                       </label>
                       <input
+                        id="original-price"
                         type="number"
                         min="0"
                         step="0.01"
@@ -865,6 +1071,106 @@ function AddProductPageInner() {
           </div>
         </form>
       </div>
+      {draftPrompt && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg max-w-md w-full">
+            <h2 className="text-lg font-bold mb-2">Draft Conflict Detected</h2>
+            <p className="mb-4">
+              We found two different drafts. Which one do you want to restore?
+            </p>
+            <div className="mb-4">
+              <button
+                className="mr-2 px-4 py-2 bg-blue-600 text-white rounded"
+                onClick={() => {
+                  setFormData(draftPrompt.local);
+                  setHasUnsavedChanges(true);
+                  setDraftPrompt(null);
+                }}
+              >
+                Restore Local Draft (Saved{" "}
+                {draftPrompt.local.lastSaved
+                  ? new Date(draftPrompt.local.lastSaved).toLocaleString()
+                  : "Unknown"}
+                )
+              </button>
+              <button
+                className="px-4 py-2 bg-green-600 text-white rounded"
+                onClick={() => {
+                  setFormData(draftPrompt.remote);
+                  setHasUnsavedChanges(false);
+                  setDraftPrompt(null);
+                }}
+              >
+                Restore Server Draft (Saved{" "}
+                {draftPrompt.remote.lastSaved
+                  ? new Date(draftPrompt.remote.lastSaved).toLocaleString()
+                  : "Unknown"}
+                )
+              </button>
+            </div>
+            <button
+              className="px-4 py-2 bg-gray-300 rounded"
+              onClick={() => setDraftPrompt(null)}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+      {showDraftLoadedModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg max-w-md w-full">
+            <h2 className="text-lg font-bold mb-2">Draft Loaded</h2>
+            <p className="mb-4">
+              A {draftLoadedType === "local" ? "local" : "server"} draft has
+              been loaded. Would you like to recover it or reset the form?
+            </p>
+            <div className="mb-4 flex gap-2">
+              <button
+                className="px-4 py-2 bg-green-600 text-white rounded"
+                onClick={() => setShowDraftLoadedModal(false)}
+              >
+                Recover Draft
+              </button>
+              <button
+                className="px-4 py-2 bg-gray-300 rounded"
+                onClick={async () => {
+                  setShowDraftLoadedModal(false);
+                  setFormData({
+                    name: "",
+                    description: "",
+                    price: 0,
+                    originalPrice: undefined,
+                    category: "automotive",
+                    brand: "",
+                    model: "",
+                    stock: 0,
+                    images: [],
+                    specifications: {},
+                    isActive: true,
+                    isFeatured: false,
+                    lastSaved: undefined,
+                    userId: user?._id,
+                  });
+                  setDraftId(null);
+                  setHasUnsavedChanges(false);
+                  clearLocalStorage();
+                  try {
+                    if (draftId) {
+                      const res = await fetch(`/api/products/${draftId}`, { method: "DELETE" });
+                      if (!res.ok) throw new Error("Failed to delete server draft");
+                    }
+                  } catch (err: any) {
+                    setDraftError(err?.message || "Failed to delete draft from server.");
+                  }
+                }}
+              >
+                Reset Form
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

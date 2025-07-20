@@ -69,7 +69,7 @@ export default function CategoriesSection() {
               </div>
 
               <Link
-                href="/power-solutions"
+                href="/search?category=power"
                 className="inline-flex items-center gap-2 text-[#b91c1c] font-semibold hover:text-[#a31b1b] transition-colors group/link"
               >
                 Explore Power Solutions
@@ -125,7 +125,7 @@ export default function CategoriesSection() {
               </div>
 
               <Link
-                href="/solar-solutions"
+                href="/search?category=solar"
                 className="inline-flex items-center gap-2 text-[#b91c1c] font-semibold hover:text-[#a31b1b] transition-colors group/link"
               >
                 Explore Solar Solutions
