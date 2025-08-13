@@ -14,6 +14,7 @@ import {
   FileText,
 } from "lucide-react";
 import Link from "next/link";
+import { getPrimaryColor } from "@/config/company-config";
 
 interface DashboardStats {
   totalProducts: number;
@@ -105,7 +106,10 @@ export default function AdminDashboardPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#b91c1c] mx-auto"></div>
+          <div 
+            className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto"
+            style={{ borderBottomColor: getPrimaryColor() }}
+          ></div>
           <p className="mt-4 text-gray-600">Loading dashboard...</p>
         </div>
       </div>
@@ -241,7 +245,11 @@ export default function AdminDashboardPage() {
               </div>
               <Link
                 href="/admin/products"
-                className="text-sm text-[#b91c1c] hover:text-[#a31b1b]"
+                className="text-sm transition-colors"
+                style={{
+                  color: getPrimaryColor(),
+                  '--hover-color': getPrimaryColor() + 'dd'
+                } as React.CSSProperties}
               >
                 View
               </Link>
@@ -259,7 +267,11 @@ export default function AdminDashboardPage() {
               </div>
               <Link
                 href="/admin/orders"
-                className="text-sm text-[#b91c1c] hover:text-[#a31b1b]"
+                className="text-sm transition-colors"
+                style={{
+                  color: getPrimaryColor(),
+                  '--hover-color': getPrimaryColor() + 'dd'
+                } as React.CSSProperties}
               >
                 View
               </Link>
@@ -277,7 +289,11 @@ export default function AdminDashboardPage() {
               </div>
               <Link
                 href="/admin/customers"
-                className="text-sm text-[#b91c1c] hover:text-[#a31b1b]"
+                className="text-sm transition-colors"
+                style={{
+                  color: getPrimaryColor(),
+                  '--hover-color': getPrimaryColor() + 'dd'
+                } as React.CSSProperties}
               >
                 View
               </Link>

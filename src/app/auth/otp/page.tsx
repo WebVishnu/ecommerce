@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import Head from "next/head";
+import { getPrimaryColor } from "@/config/company-config";
 
 export default function OtpAuthPage() {
   const [step, setStep] = useState<"mobile" | "otp">("mobile");
@@ -65,7 +66,10 @@ export default function OtpAuthPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-[#b91c1c]" />
+          <Loader2 
+            className="w-8 h-8 animate-spin mx-auto mb-4" 
+            style={{ color: getPrimaryColor() }}
+          />
           <p className="text-gray-600">Checking authentication...</p>
         </div>
       </div>
@@ -246,7 +250,11 @@ export default function OtpAuthPage() {
                 required
                 value={mobile}
                 onChange={(e) => setMobile(e.target.value.replace(/\D/g, ""))}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#b91c1c] focus:border-[#b91c1c]"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:border-transparent"
+                style={{ 
+                  '--tw-ring-color': getPrimaryColor(),
+                  '--tw-ring-opacity': '0.5'
+                } as React.CSSProperties}
                 placeholder="Enter your 10-digit mobile number"
               />
               <p className="mt-1 text-xs text-gray-500">
@@ -256,7 +264,11 @@ export default function OtpAuthPage() {
             <button
               type="submit"
               disabled={loading || mobile.length !== 10}
-              className="w-full bg-[#b91c1c] text-white py-2 rounded-md font-medium hover:bg-[#a31b1b] transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full text-white py-2 rounded-md font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+              style={{ 
+                backgroundColor: getPrimaryColor(),
+                '--hover-color': getPrimaryColor() + 'dd'
+              } as React.CSSProperties}
             >
               {loading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -294,7 +306,11 @@ export default function OtpAuthPage() {
                 required
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#b91c1c] focus:border-[#b91c1c] tracking-widest text-lg text-center"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:border-transparent tracking-widest text-lg text-center"
+                style={{ 
+                  '--tw-ring-color': getPrimaryColor(),
+                  '--tw-ring-opacity': '0.5'
+                } as React.CSSProperties}
                 placeholder="4-digit OTP"
                 autoFocus
               />
@@ -304,7 +320,11 @@ export default function OtpAuthPage() {
             <button
               type="submit"
               disabled={loading || otp.length !== 4}
-              className="w-full bg-[#b91c1c] text-white py-2 rounded-md font-medium hover:bg-[#a31b1b] transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full text-white py-2 rounded-md font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+              style={{ 
+                backgroundColor: getPrimaryColor(),
+                '--hover-color': getPrimaryColor() + 'dd'
+              } as React.CSSProperties}
             >
               {loading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -318,7 +338,11 @@ export default function OtpAuthPage() {
                 type="button"
                 onClick={handleResendOtp}
                 disabled={countdown > 0 || loading}
-                className="text-sm text-[#b91c1c] hover:text-[#a31b1b] disabled:text-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-1 mx-auto"
+                className="text-sm disabled:text-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-1 mx-auto"
+                style={{ 
+                  color: getPrimaryColor(),
+                  '--hover-color': getPrimaryColor() + 'dd'
+                } as React.CSSProperties}
               >
                 {loading ? (
                   <>
@@ -341,7 +365,10 @@ export default function OtpAuthPage() {
                   setError(null);
                   setInfo(null);
                 }}
-                className="flex items-center justify-center gap-1 text-sm text-gray-500 hover:text-[#b91c1c] w-full"
+                className="flex items-center justify-center gap-1 text-sm text-gray-500 w-full"
+                style={{ 
+                  '--hover-color': getPrimaryColor()
+                } as React.CSSProperties}
               >
                 <ArrowLeft className="w-4 h-4" />
                 Change mobile number

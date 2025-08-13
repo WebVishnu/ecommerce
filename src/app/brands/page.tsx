@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ExternalLink, Star, Award, Zap } from "lucide-react";
+import { getPrimaryColor } from "@/config/company-config";
 
 // Indian Battery Brands with detailed information
 const INDIAN_BATTERY_BRANDS = [
@@ -194,7 +195,11 @@ export default function BrandsPage() {
                 placeholder="Search brands..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#b91c1c] focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent"
+                style={{
+                  '--tw-ring-color': getPrimaryColor(),
+                  '--tw-ring-opacity': '0.5'
+                } as React.CSSProperties}
               />
             </div>
           </div>
@@ -206,7 +211,11 @@ export default function BrandsPage() {
               <button
                 key={specialty}
                 onClick={() => handleSpecialtyClick(specialty)}
-                className="px-3 py-1 text-sm bg-[#b91c1c] text-white rounded-full hover:bg-[#a31b1b] transition-colors"
+                className="px-3 py-1 text-sm text-white rounded-full transition-colors"
+                style={{
+                  backgroundColor: getPrimaryColor(),
+                  '--hover-color': getPrimaryColor() + 'dd'
+                } as React.CSSProperties}
               >
                 {specialty}
               </button>
@@ -251,7 +260,12 @@ export default function BrandsPage() {
                     </div>
                   </div>
 
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-[#b91c1c] transition-colors">
+                  <h3 
+                    className="text-xl font-bold text-gray-900 mb-2 transition-colors"
+                    style={{
+                      '--hover-color': getPrimaryColor()
+                    } as React.CSSProperties}
+                  >
                     {brand.name}
                   </h3>
 
@@ -303,7 +317,11 @@ export default function BrandsPage() {
                         e.stopPropagation();
                         handleBrandClick(brand.name);
                       }}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[#b91c1c] text-white rounded-lg hover:bg-[#a31b1b] transition-colors text-sm font-medium"
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 text-white rounded-lg transition-colors text-sm font-medium"
+                      style={{
+                        backgroundColor: getPrimaryColor(),
+                        '--hover-color': getPrimaryColor() + 'dd'
+                      } as React.CSSProperties}
                     >
                       <Zap className="w-4 h-4" />
                       View Products
@@ -337,7 +355,11 @@ export default function BrandsPage() {
                 setSearchQuery("");
                 setSelectedSpecialty("");
               }}
-              className="px-6 py-2 bg-[#b91c1c] text-white rounded-lg hover:bg-[#a31b1b] transition-colors"
+              className="px-6 py-2 text-white rounded-lg transition-colors"
+              style={{
+                backgroundColor: getPrimaryColor(),
+                '--hover-color': getPrimaryColor() + 'dd'
+              } as React.CSSProperties}
             >
               Clear Filters
             </button>

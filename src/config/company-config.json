@@ -1,0 +1,177 @@
+{
+  "company": {
+    "name": "Shivangi Battery",
+    "shortName": "Shivangi",
+    "tagline": "Powering Your World",
+    "description": "Your trusted partner for quality batteries and power solutions",
+    "website": "https://shivangibattery.com",
+    "founded": "2020"
+  },
+  "contact": {
+    "phone": {
+      "primary": "+91 98765 43210",
+      "secondary": "+91 98765 43211",
+      "whatsapp": "+91 98765 43210"
+    },
+    "email": {
+      "primary": "info@shivangibattery.com",
+      "support": "support@shivangibattery.com",
+      "sales": "sales@shivangibattery.com"
+    },
+    "address": {
+      "street": "123 Battery Street",
+      "city": "Mumbai",
+      "state": "Maharashtra",
+      "pincode": "400001",
+      "country": "India",
+      "full": "123 Battery Street, Mumbai, Maharashtra 400001, India"
+    },
+    "businessHours": {
+      "monday": "9:00 AM - 6:00 PM",
+      "tuesday": "9:00 AM - 6:00 PM",
+      "wednesday": "9:00 AM - 6:00 PM",
+      "thursday": "9:00 AM - 6:00 PM",
+      "friday": "9:00 AM - 6:00 PM",
+      "saturday": "9:00 AM - 4:00 PM",
+      "sunday": "Closed"
+    }
+  },
+  "branding": {
+    "colors": {
+      "primary": {
+        "main": "#FF6B35",
+        "light": "#FF8A65",
+        "dark": "#E64A19",
+        "contrast": "#FFFFFF"
+      },
+      "secondary": {
+        "main": "#2E7D32",
+        "light": "#4CAF50",
+        "dark": "#1B5E20",
+        "contrast": "#FFFFFF"
+      },
+      "accent": {
+        "main": "#FFC107",
+        "light": "#FFD54F",
+        "dark": "#FF8F00",
+        "contrast": "#000000"
+      },
+      "background": {
+        "primary": "#FFFFFF",
+        "secondary": "#F5F5F5",
+        "tertiary": "#FFF8F0",
+        "dark": "#212121"
+      },
+      "text": {
+        "primary": "#212121",
+        "secondary": "#757575",
+        "disabled": "#BDBDBD",
+        "inverse": "#FFFFFF"
+      },
+      "status": {
+        "success": "#4CAF50",
+        "warning": "#FF9800",
+        "error": "#F44336",
+        "info": "#2196F3"
+      }
+    },
+    "logo": {
+      "primary": "/logo.png",
+      "secondary": "/logo-white.png",
+      "favicon": "/favicon.ico",
+      "alt": "Shivangi Battery Logo"
+    },
+    "fonts": {
+      "primary": "Inter, sans-serif",
+      "secondary": "Poppins, sans-serif",
+      "mono": "GeistMonoVF, monospace"
+    }
+  },
+  "social": {
+    "facebook": "https://facebook.com/shivangibattery",
+    "instagram": "https://instagram.com/shivangibattery",
+    "twitter": "https://twitter.com/shivangibattery",
+    "linkedin": "https://linkedin.com/company/shivangibattery",
+    "youtube": "https://youtube.com/shivangibattery"
+  },
+  "features": {
+    "enableOTP": true,
+    "enableWhatsApp": true,
+    "enableReviews": true,
+    "enableWishlist": true,
+    "enableCompare": true,
+    "enableNewsletter": true,
+    "enableLiveChat": false,
+    "enableMultiLanguage": false,
+    "enableMultiCurrency": false
+  },
+  "seo": {
+    "title": "Shivangi Battery - Quality Batteries & Power Solutions",
+    "description": "Shop for high-quality batteries, inverters, and power solutions. Fast delivery, expert support, and competitive prices.",
+    "keywords": "batteries, inverters, power solutions, automotive batteries, UPS batteries",
+    "author": "Shivangi Battery",
+    "ogImage": "/og-image.jpg"
+  },
+  "payment": {
+    "methods": ["cod", "online", "upi", "card"],
+    "currencies": ["INR"],
+    "taxRate": 18,
+    "shipping": {
+      "freeThreshold": 1000,
+      "baseRate": 100,
+      "expressRate": 200
+    }
+  },
+  "content": {
+    "hero": {
+      "title": "Power Your Life with Quality Batteries",
+      "subtitle": "From automotive to industrial, we have the perfect battery for every need",
+      "cta": "Shop Now"
+    },
+    "about": {
+      "title": "About Shivangi Battery",
+      "description": "We are a leading battery supplier committed to providing high-quality power solutions for homes, businesses, and industries.",
+      "highlights": [
+        "Quality Products",
+        "Expert Support",
+        "Fast Delivery",
+        "Competitive Prices"
+      ]
+    },
+    "footer": {
+      "description": "Your trusted partner for all battery and power solution needs. Quality products, expert support, and reliable service.",
+      "quickLinks": [
+        "About Us",
+        "Products",
+        "Contact",
+        "Support"
+      ]
+    }
+  },
+  "categories": [
+    {
+      "id": "automotive",
+      "name": "Automotive",
+      "description": "Car, bike, and truck batteries",
+      "icon": "car"
+    },
+    {
+      "id": "inverter",
+      "name": "Inverter",
+      "description": "Home and office inverter batteries",
+      "icon": "zap"
+    },
+    {
+      "id": "ups",
+      "name": "UPS",
+      "description": "Uninterrupted power supply batteries",
+      "icon": "shield"
+    },
+    {
+      "id": "industrial",
+      "name": "Industrial",
+      "description": "Heavy-duty industrial batteries",
+      "icon": "factory"
+    }
+  ]
+} 

@@ -2,28 +2,47 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { config, getPrimaryColor } from "@/config/company-config";
+
 export default function Hero() {
   const router = useRouter();
   return (
-    <section className="relative bg-[#fff8f0] min-h-[480px] flex items-center justify-center overflow-hidden border-b border-gray-200">
+    <section 
+      className="relative min-h-[480px] flex items-center justify-center overflow-hidden border-b border-gray-200"
+      style={{ backgroundColor: config.branding.colors.background.tertiary }}
+    >
       <div className=" mx-auto w-full flex flex-col md:flex-row items-center justify-between py-16 md:py-24">
         {/* Left: Text */}
         <div className="flex-1 z-10">
-          <div className="uppercase text-xs tracking-widest text-[#b91c1c] mb-2 font-semibold">
+          <div 
+            className="uppercase text-xs tracking-widest mb-2 font-semibold"
+            style={{ color: getPrimaryColor() }}
+          >
             Authorised Battery Dealer
           </div>
           <h1 className="text-3xl md:text-5xl font-serif font-bold text-gray-900 mb-4 leading-tight">
-            Powering Homes, Businesses & Vehicles in Atrauli
+            {config.content.hero.title}
           </h1>
           <p className="text-lg text-gray-700 mb-4">
-            Inverter, Automotive, Solar & UPS Batteries from Exide, Amaron,
-            Luminous, Livguard, Okaya & more.
+            {config.content.hero.subtitle}
           </p>
           <button
-            className="px-7 py-2 border border-[#b91c1c] bg-[#b91c1c] text-white rounded text-base font-semibold hover:bg-[#a31b1b] transition"
+            className="px-7 py-2 border text-white rounded text-base font-semibold transition"
+            style={{ 
+              backgroundColor: getPrimaryColor(),
+              borderColor: getPrimaryColor()
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = config.branding.colors.primary.dark;
+              e.currentTarget.style.borderColor = config.branding.colors.primary.dark;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = getPrimaryColor();
+              e.currentTarget.style.borderColor = getPrimaryColor();
+            }}
             onClick={() => router.push("/search")}
           >
-            Shop Batteries
+            {config.content.hero.cta}
           </button>
         </div>
         {/* Right: Image Collage */}

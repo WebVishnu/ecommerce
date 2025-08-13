@@ -24,6 +24,7 @@ import {
   Map,
   Trash2,
 } from "lucide-react";
+import { getPrimaryColor } from "@/config/company-config";
 
 function ProfilePageInner() {
   const { user, isAuthenticated, logout, loading, isHydrated, updateUser } =
@@ -147,7 +148,10 @@ function ProfilePageInner() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#b91c1c] mx-auto"></div>
+          <div 
+            className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto"
+            style={{ borderBottomColor: getPrimaryColor() }}
+          ></div>
           <p className="mt-4 text-gray-600">Loading profile...</p>
         </div>
       </div>
@@ -588,7 +592,11 @@ function ProfilePageInner() {
         {!isEditing ? (
           <button
             onClick={() => setIsEditing(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-[#b91c1c] text-white rounded-md hover:bg-[#a31b1b] transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-white rounded-md transition-colors"
+            style={{ 
+              backgroundColor: getPrimaryColor(),
+              '--hover-color': getPrimaryColor() + 'dd'
+            } as React.CSSProperties}
           >
             <Edit className="w-4 h-4" />
             Edit Profile
@@ -644,7 +652,11 @@ function ProfilePageInner() {
                   type="text"
                   value={editForm.name}
                   onChange={(e) => handleInputChange("name", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#b91c1c]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent"
+                  style={{ 
+                    '--tw-ring-color': getPrimaryColor(),
+                    '--tw-ring-opacity': '0.5'
+                  } as React.CSSProperties}
                 />
               ) : (
                 <p className="text-gray-900">{user?.name}</p>
@@ -659,7 +671,11 @@ function ProfilePageInner() {
                   type="email"
                   value={editForm.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#b91c1c]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent"
+                  style={{ 
+                    '--tw-ring-color': getPrimaryColor(),
+                    '--tw-ring-opacity': '0.5'
+                  } as React.CSSProperties}
                 />
               ) : (
                 <p className="text-gray-900 flex items-center gap-2">
@@ -677,7 +693,11 @@ function ProfilePageInner() {
                   type="tel"
                   value={editForm.phone}
                   onChange={(e) => handleInputChange("phone", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#b91c1c]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent"
+                  style={{ 
+                    '--tw-ring-color': getPrimaryColor(),
+                    '--tw-ring-opacity': '0.5'
+                  } as React.CSSProperties}
                 />
               ) : (
                 <p className="text-gray-900 flex items-center gap-2">
@@ -713,7 +733,11 @@ function ProfilePageInner() {
                     landmark: "",
                   });
                 }}
-                className="flex items-center gap-2 text-sm bg-[#b91c1c] text-white px-3 py-2 rounded-md hover:bg-[#a31b1b] transition-colors"
+                className="flex items-center gap-2 text-sm text-white px-3 py-2 rounded-md transition-colors"
+                style={{ 
+                  backgroundColor: getPrimaryColor(),
+                  '--hover-color': getPrimaryColor() + 'dd'
+                } as React.CSSProperties}
               >
                 <X className="w-4 h-4" />
                 Cancel
@@ -721,7 +745,11 @@ function ProfilePageInner() {
             ) : (
               <button
                 onClick={() => setShowAddressForm(true)}
-                className="flex items-center gap-2 text-sm bg-[#b91c1c] text-white px-3 py-2 rounded-md hover:bg-[#a31b1b] transition-colors"
+                className="flex items-center gap-2 text-sm text-white px-3 py-2 rounded-md transition-colors"
+                style={{ 
+                  backgroundColor: getPrimaryColor(),
+                  '--hover-color': getPrimaryColor() + 'dd'
+                } as React.CSSProperties}
               >
                 <Plus className="w-4 h-4" />
                 Add address
@@ -762,7 +790,11 @@ function ProfilePageInner() {
                     onChange={(e) =>
                       handleAddressInputChange("street", e.target.value)
                     }
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#b91c1c] focus:border-[#b91c1c]"
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:border-transparent"
+                    style={{ 
+                      '--tw-ring-color': getPrimaryColor(),
+                      '--tw-ring-opacity': '0.5'
+                    } as React.CSSProperties}
                     placeholder="House/Flat number, Street name"
                   />
                 </div>
@@ -777,7 +809,11 @@ function ProfilePageInner() {
                     onChange={(e) =>
                       handleAddressInputChange("city", e.target.value)
                     }
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#b91c1c] focus:border-[#b91c1c]"
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:border-transparent"
+                    style={{ 
+                      '--tw-ring-color': getPrimaryColor(),
+                      '--tw-ring-opacity': '0.5'
+                    } as React.CSSProperties}
                     placeholder="City"
                   />
                 </div>
@@ -792,7 +828,11 @@ function ProfilePageInner() {
                     onChange={(e) =>
                       handleAddressInputChange("state", e.target.value)
                     }
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#b91c1c] focus:border-[#b91c1c]"
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:border-transparent"
+                    style={{ 
+                      '--tw-ring-color': getPrimaryColor(),
+                      '--tw-ring-opacity': '0.5'
+                    } as React.CSSProperties}
                     placeholder="State"
                   />
                 </div>
@@ -811,7 +851,11 @@ function ProfilePageInner() {
                         e.target.value.replace(/\D/g, "")
                       )
                     }
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#b91c1c] focus:border-[#b91c1c]"
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:border-transparent"
+                    style={{ 
+                      '--tw-ring-color': getPrimaryColor(),
+                      '--tw-ring-opacity': '0.5'
+                    } as React.CSSProperties}
                     placeholder="6-digit pincode"
                   />
                 </div>
@@ -825,7 +869,11 @@ function ProfilePageInner() {
                     onChange={(e) =>
                       handleAddressInputChange("addressType", e.target.value)
                     }
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#b91c1c] focus:border-[#b91c1c] text-black"
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:border-transparent text-black"
+                    style={{ 
+                      '--tw-ring-color': getPrimaryColor(),
+                      '--tw-ring-opacity': '0.5'
+                    } as React.CSSProperties}
                   >
                     <option value="home">Home</option>
                     <option value="work">Work</option>
@@ -843,7 +891,11 @@ function ProfilePageInner() {
                     onChange={(e) =>
                       handleAddressInputChange("landmark", e.target.value)
                     }
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#b91c1c] focus:border-[#b91c1c]"
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:border-transparent"
+                    style={{ 
+                      '--tw-ring-color': getPrimaryColor(),
+                      '--tw-ring-opacity': '0.5'
+                    } as React.CSSProperties}
                     placeholder="Nearby landmark"
                   />
                 </div>
@@ -859,7 +911,11 @@ function ProfilePageInner() {
                           e.target.checked.toString()
                         )
                       }
-                      className="rounded border-gray-300 text-[#b91c1c] focus:ring-[#b91c1c]"
+                      className="rounded border-gray-300"
+                      style={{ 
+                        color: getPrimaryColor(),
+                        '--tw-ring-color': getPrimaryColor()
+                      } as React.CSSProperties}
                     />
                     <span className="text-sm text-gray-700">
                       Set as default address
@@ -875,7 +931,11 @@ function ProfilePageInner() {
                       ? handleUpdateAddress
                       : handleAddAddress
                   }
-                  className="bg-[#b91c1c] text-white px-4 py-2 rounded-md hover:bg-[#a31b1b] transition-colors"
+                  className="text-white px-4 py-2 rounded-md transition-colors"
+                  style={{ 
+                    backgroundColor: getPrimaryColor(),
+                    '--hover-color': getPrimaryColor() + 'dd'
+                  } as React.CSSProperties}
                 >
                   {editingAddressIndex !== null
                     ? "Update Address"
@@ -941,7 +1001,11 @@ function ProfilePageInner() {
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleEditAddress(index)}
-                          className="text-sm text-[#b91c1c] hover:text-[#a31b1b] px-2 py-1 rounded hover:bg-gray-50"
+                          className="text-sm px-2 py-1 rounded hover:bg-gray-50"
+                          style={{ 
+                            color: getPrimaryColor(),
+                            '--hover-color': getPrimaryColor() + 'dd'
+                          } as React.CSSProperties}
                         >
                           Edit
                         </button>
@@ -962,7 +1026,11 @@ function ProfilePageInner() {
                 <p className="text-gray-500 text-sm mb-3">No addresses saved</p>
                 <button
                   onClick={() => setShowAddressForm(true)}
-                  className="text-[#b91c1c] hover:text-[#a31b1b] text-sm font-medium"
+                  className="text-sm font-medium"
+                  style={{ 
+                    color: getPrimaryColor(),
+                    '--hover-color': getPrimaryColor() + 'dd'
+                  } as React.CSSProperties}
                 >
                   Add your first address
                 </button>
@@ -1007,7 +1075,10 @@ function ProfilePageInner() {
 
       {ordersLoading ? (
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#b91c1c] mx-auto"></div>
+          <div 
+            className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto"
+            style={{ borderBottomColor: getPrimaryColor() }}
+          ></div>
           <p className="mt-4 text-gray-600">Loading orders...</p>
         </div>
       ) : orders.length === 0 ? (
@@ -1021,7 +1092,11 @@ function ProfilePageInner() {
           </p>
           <button
             onClick={() => router.push("/search")}
-            className="px-6 py-2 bg-[#b91c1c] text-white rounded-md hover:bg-[#a31b1b] transition-colors"
+            className="px-6 py-2 text-white rounded-md transition-colors"
+            style={{ 
+              backgroundColor: getPrimaryColor(),
+              '--hover-color': getPrimaryColor() + 'dd'
+            } as React.CSSProperties}
           >
             Browse Products
           </button>
@@ -1133,7 +1208,11 @@ function ProfilePageInner() {
                   <button
                     onClick={() => handleReorder(order)}
                     disabled={reorderLoading === order._id}
-                    className="sm:px-3 px-1 py-1 text-sm text-[#b91c1c] hover:bg-[#b91c1c]/10 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="sm:px-3 px-1 py-1 text-sm rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ 
+                      color: getPrimaryColor(),
+                      '--hover-color': getPrimaryColor() + '10'
+                    } as React.CSSProperties}
                   >
                     {reorderLoading === order._id ? "Adding..." : "Reorder"}
                   </button>
@@ -1162,7 +1241,11 @@ function ProfilePageInner() {
                 </div>
                 <Link
                   href={`/orders/${order._id}`}
-                  className="px-4 py-2 bg-[#b91c1c] text-white rounded-md hover:bg-[#a31b1b] transition-colors text-sm font-medium"
+                  className="px-4 py-2 text-white rounded-md transition-colors text-sm font-medium"
+                  style={{ 
+                    backgroundColor: getPrimaryColor(),
+                    '--hover-color': getPrimaryColor() + 'dd'
+                  } as React.CSSProperties}
                 >
                   View Details
                 </Link>
@@ -1230,7 +1313,14 @@ function ProfilePageInner() {
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" className="sr-only peer" defaultChecked />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#b91c1c]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#b91c1c]"></div>
+              <div 
+                className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"
+                style={{ 
+                  '--tw-ring-color': getPrimaryColor() + '20',
+                  '--tw-ring-opacity': '0.2',
+                  backgroundColor: 'var(--peer-checked-bg, rgb(229 231 235))'
+                } as React.CSSProperties}
+              ></div>
             </label>
           </div>
           <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
@@ -1242,7 +1332,14 @@ function ProfilePageInner() {
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" className="sr-only peer" />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#b91c1c]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#b91c1c]"></div>
+              <div 
+                className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"
+                style={{ 
+                  '--tw-ring-color': getPrimaryColor() + '20',
+                  '--tw-ring-opacity': '0.2',
+                  backgroundColor: 'var(--peer-checked-bg, rgb(229 231 235))'
+                } as React.CSSProperties}
+              ></div>
             </label>
           </div>
         </div>
@@ -1288,9 +1385,12 @@ function ProfilePageInner() {
                         }}
                         className={`w-full flex items-center sm:justify-start justify-center gap-3 px-4 py-3 rounded-md text-left transition-colors ${
                           activeTab === tab.id
-                            ? "bg-[#b91c1c] text-white"
+                            ? "text-white"
                             : "text-gray-700 hover:bg-gray-100"
                         }`}
+                        style={activeTab === tab.id ? {
+                          backgroundColor: getPrimaryColor()
+                        } : {} as React.CSSProperties}
                       >
                         <Icon className="w-5 h-5" />
                         <span

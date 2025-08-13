@@ -14,10 +14,14 @@ import {
   ChevronDown,
   ChevronUp,
   Filter,
+  Zap,
+  Shield,
+  Factory,
 } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
 import { Product, productAPI } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { config, getPrimaryColor } from "@/config/company-config";
 
 // Indian Battery Brands
 const INDIAN_BATTERY_BRANDS = [
@@ -50,14 +54,17 @@ const INDIAN_BATTERY_BRANDS = [
   },
 ];
 
-// Categories
-const CATEGORIES = [
-  { name: "Inverter", icon: Home, color: "bg-blue-100 text-blue-600" },
-  { name: "Automotive", icon: Car, color: "bg-green-100 text-green-600" },
-  { name: "Solar", icon: Sun, color: "bg-yellow-100 text-yellow-600" },
-  { name: "UPS", icon: Battery, color: "bg-purple-100 text-purple-600" },
-  { name: "Industrial", icon: Building, color: "bg-gray-100 text-gray-600" },
-];
+// Icon mapping for categories
+const iconMap = {
+  car: Car,
+  zap: Zap,
+  shield: Shield,
+  sun: Sun,
+  factory: Factory,
+  home: Home,
+  battery: Battery,
+  building: Building,
+};
 
 function SearchPageInner() {
   const { isAdmin } = useAuth();
@@ -226,23 +233,29 @@ function SearchPageInner() {
         </button>
         {expandedSections.categories && (
           <div className="space-y-2">
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat.name}
-                onClick={() => {
-                  setSelectedCategory(selectedCategory === cat.name ? '' : cat.name);
-                  setPagination(prev => ({ ...prev, page: 1 }));
-                }}
-                className={`flex items-center gap-2 w-full text-left p-2 rounded-md transition-colors ${
-                  selectedCategory === cat.name
-                    ? 'bg-[#b91c1c] text-white'
-                    : 'hover:bg-gray-50'
-                }`}
-              >
-                <cat.icon className="w-4 h-4" />
-                <span className="text-sm">{cat.name}</span>
-              </button>
-            ))}
+            {config.categories.map((cat) => {
+              const IconComponent = iconMap[cat.icon as keyof typeof iconMap] || Home;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => {
+                    setSelectedCategory(selectedCategory === cat.name ? '' : cat.name);
+                    setPagination(prev => ({ ...prev, page: 1 }));
+                  }}
+                  className={`flex items-center gap-2 w-full text-left p-2 rounded-md transition-colors ${
+                    selectedCategory === cat.name
+                      ? 'text-white'
+                      : 'hover:bg-gray-50'
+                  }`}
+                  style={{
+                    backgroundColor: selectedCategory === cat.name ? getPrimaryColor() : 'transparent'
+                  }}
+                >
+                  <IconComponent className="w-4 h-4" />
+                  <span className="text-sm">{cat.name}</span>
+                </button>
+              );
+            })}
           </div>
         )}
       </div>
@@ -271,9 +284,12 @@ function SearchPageInner() {
                 }}
                 className={`flex items-center gap-2 w-full text-left p-2 rounded-md transition-colors ${
                   selectedBrand === brandItem.name
-                    ? 'bg-[#b91c1c] text-white'
+                    ? 'text-white'
                     : 'hover:bg-gray-50'
                 }`}
+                style={{
+                  backgroundColor: selectedBrand === brandItem.name ? getPrimaryColor() : 'transparent'
+                }}
               >
                 <span className="text-sm">{brandItem.name}</span>
               </button>
@@ -307,7 +323,11 @@ function SearchPageInner() {
                   setPriceRange(prev => ({ ...prev, min: e.target.value }));
                   setPagination(prev => ({ ...prev, page: 1 }));
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#b91c1c]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent"
+                style={{ 
+                  '--tw-ring-color': getPrimaryColor(),
+                  '--tw-ring-opacity': '0.5'
+                } as React.CSSProperties}
               />
             </div>
             <div>
@@ -320,7 +340,11 @@ function SearchPageInner() {
                   setPriceRange(prev => ({ ...prev, max: e.target.value }));
                   setPagination(prev => ({ ...prev, page: 1 }));
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#b91c1c]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent"
+                style={{ 
+                  '--tw-ring-color': getPrimaryColor(),
+                  '--tw-ring-opacity': '0.5'
+                } as React.CSSProperties}
               />
             </div>
           </div>
@@ -350,7 +374,11 @@ function SearchPageInner() {
                 placeholder="Search for batteries..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#b91c1c] focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent"
+                style={{ 
+                  '--tw-ring-color': getPrimaryColor(),
+                  '--tw-ring-opacity': '0.5'
+                } as React.CSSProperties}
               />
             </div>
             <button

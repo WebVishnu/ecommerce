@@ -10,6 +10,14 @@ import {
   Instagram,
   Twitter,
 } from "lucide-react";
+import { 
+  config, 
+  getCompanyName, 
+  getPrimaryColor, 
+  getPrimaryPhone, 
+  getPrimaryEmail, 
+  getFullAddress 
+} from "@/config/company-config";
 
 export default function Footer() {
   return (
@@ -21,12 +29,10 @@ export default function Footer() {
           <div className="space-y-4">
             <div>
               <h3 className="text-xl font-bold text-white mb-3">
-                Shivangi Battery
+                {getCompanyName()}
               </h3>
               <p className="text-gray-300 text-sm leading-relaxed">
-                Your trusted partner for all battery solutions. Quality
-                products, reliable service, and expert support for all your
-                power needs.
+                {config.content.footer.description}
               </p>
             </div>
           </div>
@@ -35,30 +41,20 @@ export default function Footer() {
           <div className="space-y-4">
             <h4 className="text-lg font-semibold text-white">Quick Links</h4>
             <ul className="space-y-2">
-              <li>
-                <a
-                  href="/"
-                  className="text-gray-300 hover:text-[#b91c1c] transition-colors text-sm"
-                >
-                  Home
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/search"
-                  className="text-gray-300 hover:text-[#b91c1c] transition-colors text-sm"
-                >
-                  Products
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/about"
-                  className="text-gray-300 hover:text-[#b91c1c] transition-colors text-sm"
-                >
-                  About Us
-                </a>
-              </li>
+              {config.content.footer.quickLinks.map((link, index) => (
+                <li key={index}>
+                  <a
+                    href={`/${link.toLowerCase().replace(' ', '-')}`}
+                    className="text-gray-300 hover:text-[#b91c1c] transition-colors text-sm"
+                    style={{ 
+                      '--tw-text-opacity': '1',
+                      '--hover-color': getPrimaryColor()
+                    } as React.CSSProperties}
+                  >
+                    {link}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -79,52 +75,73 @@ export default function Footer() {
             <h4 className="text-lg font-semibold text-white">Contact Info</h4>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 text-[#b91c1c] mt-0.5 flex-shrink-0" />
+                <MapPin 
+                  className="w-4 h-4 mt-0.5 flex-shrink-0" 
+                  style={{ color: getPrimaryColor() }}
+                />
                 <div>
                   <a 
                     href="https://maps.app.goo.gl/9WZc1Rw6ice8FZFk9" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-gray-300 hover:text-[#b91c1c] transition-colors"
+                    style={{ 
+                      '--hover-color': getPrimaryColor()
+                    } as React.CSSProperties}
                   >
                     <p className="text-gray-300 text-sm">
-                      Ramghat Road Atrauli Aligarh U P,{" "}
+                      {config.contact.address.street}
                     </p>
                     <p className="text-gray-300 text-sm">
-                      Atrauli Aligarh, Uttar Pradesh 202280
+                      {config.contact.address.city}, {config.contact.address.state} {config.contact.address.pincode}
                     </p>
                   </a>
                 </div>
               </div>
               
               <div className="flex items-center gap-3">
-                <Phone className="w-4 h-4 text-[#b91c1c] flex-shrink-0" />
+                <Phone 
+                  className="w-4 h-4 flex-shrink-0" 
+                  style={{ color: getPrimaryColor() }}
+                />
                 <a
-                  href="tel:+919761145106"
+                  href={`tel:${getPrimaryPhone()}`}
                   className="text-gray-300 hover:text-[#b91c1c] transition-colors text-sm"
+                  style={{ 
+                    '--hover-color': getPrimaryColor()
+                  } as React.CSSProperties}
                 >
-                  +91-97611-45106
+                  {getPrimaryPhone()}
                 </a>
               </div>
 
               <div className="flex items-center gap-3">
-                <Mail className="w-4 h-4 text-[#b91c1c] flex-shrink-0" />
+                <Mail 
+                  className="w-4 h-4 flex-shrink-0" 
+                  style={{ color: getPrimaryColor() }}
+                />
                 <a
-                  href="mailto:info@shivangibattery.com"
+                  href={`mailto:${getPrimaryEmail()}`}
                   className="text-gray-300 hover:text-[#b91c1c] transition-colors text-sm"
+                  style={{ 
+                    '--hover-color': getPrimaryColor()
+                  } as React.CSSProperties}
                 >
-                  info@shivangibattery.com
+                  {getPrimaryEmail()}
                 </a>
               </div>
 
               <div className="flex items-center gap-3">
-                <Clock className="w-4 h-4 text-[#b91c1c] flex-shrink-0" />
+                <Clock 
+                  className="w-4 h-4 flex-shrink-0" 
+                  style={{ color: getPrimaryColor() }}
+                />
                 <div>
                   <p className="text-gray-300 text-sm">
-                    Mon-Sat: 9:00 AM - 8:00 PM
+                    Mon-Sat: {config.contact.businessHours.monday}
                   </p>
                   <p className="text-gray-300 text-sm">
-                    Sunday: 10:00 AM - 6:00 PM
+                    Sunday: {config.contact.businessHours.sunday}
                   </p>
                 </div>
               </div>
@@ -143,8 +160,8 @@ export default function Footer() {
                 Need immediate assistance?
               </span>
             </div>
-                        <a 
-              href="https://wa.me/919761145106" 
+            <a 
+              href={`https://wa.me/${config.contact.phone.whatsapp.replace(/\D/g, '')}`}
               target="_blank" 
               rel="noopener noreferrer" 
               className="bg-[#25D366] hover:bg-[#128C7E] text-white px-6 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2"
@@ -162,16 +179,28 @@ export default function Footer() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-400">
             <div className="flex flex-col md:flex-row items-center gap-4">
               <span>
-                &copy; {new Date().getFullYear()} Shivangi Battery. All rights
+                &copy; {new Date().getFullYear()} {getCompanyName()}. All rights
                 reserved.
               </span>
             </div>
             <div className="flex items-center gap-4">
-              <a href="#" className="hover:text-[#b91c1c] transition-colors">
+              <a 
+                href="#" 
+                className="hover:text-[#b91c1c] transition-colors"
+                style={{ 
+                  '--hover-color': getPrimaryColor()
+                } as React.CSSProperties}
+              >
                 Privacy Policy
               </a>
               <span>|</span>
-              <a href="#" className="hover:text-[#b91c1c] transition-colors">
+              <a 
+                href="#" 
+                className="hover:text-[#b91c1c] transition-colors"
+                style={{ 
+                  '--hover-color': getPrimaryColor()
+                } as React.CSSProperties}
+              >
                 Terms of Service
               </a>
             </div>

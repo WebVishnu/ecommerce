@@ -29,6 +29,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Product } from "@/lib/api";
 import Link from "next/link";
+import { getPrimaryColor } from "@/config/company-config";
 
 // Loading Skeleton Component
 const ProductSkeleton = () => (
@@ -63,7 +64,10 @@ const Breadcrumb = ({ product }: { product: Product }) => (
       <li>
         <Link
           href="/"
-          className="flex items-center gap-1 hover:text-[#b91c1c] transition-colors focus:outline-none focus:ring-2 focus:ring-[#b91c1c] focus:ring-offset-2 rounded"
+          className="flex items-center gap-1 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 rounded"
+          style={{
+            color: getPrimaryColor()
+          } as React.CSSProperties}
           aria-label="Go to home page"
         >
           <Home className="w-4 h-4" />
@@ -76,7 +80,10 @@ const Breadcrumb = ({ product }: { product: Product }) => (
       <li>
         <Link
           href="/search"
-          className="hover:text-[#b91c1c] transition-colors focus:outline-none focus:ring-2 focus:ring-[#b91c1c] focus:ring-offset-2 rounded"
+          className="transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 rounded"
+          style={{
+            color: getPrimaryColor()
+          } as React.CSSProperties}
           aria-label="Browse all products"
         >
           Products
@@ -88,7 +95,10 @@ const Breadcrumb = ({ product }: { product: Product }) => (
       <li>
         <Link
           href={`/search?category=${product.category}`}
-          className="hover:text-[#b91c1c] transition-colors focus:outline-none focus:ring-2 focus:ring-[#b91c1c] focus:ring-offset-2 rounded capitalize"
+          className="transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 rounded capitalize"
+          style={{
+            color: getPrimaryColor()
+          } as React.CSSProperties}
           aria-label={`Browse ${product.category} products`}
         >
           {product.category}
@@ -316,7 +326,10 @@ const ShareModal = ({
           </h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-[#b91c1c] rounded"
+            className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 rounded"
+            style={{
+              '--tw-ring-color': getPrimaryColor()
+            } as React.CSSProperties}
             aria-label="Close share modal"
           >
             <X className="w-5 h-5" />
@@ -331,7 +344,10 @@ const ShareModal = ({
                 option.action();
                 onClose();
               }}
-              className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-[#b91c1c]"
+              className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors focus:outline-none focus:ring-2"
+              style={{
+                '--tw-ring-color': getPrimaryColor()
+              } as React.CSSProperties}
             >
               <span className="text-2xl">{option.icon}</span>
               <span className="font-medium">{option.name}</span>
@@ -486,7 +502,12 @@ export default function ProductDetailsPage() {
           <div className="space-y-3">
             <Link
               href="/search"
-              className="inline-flex items-center gap-2 bg-[#b91c1c] text-white px-6 py-3 rounded-md hover:bg-[#a31b1b] transition-colors focus:outline-none focus:ring-2 focus:ring-[#b91c1c] focus:ring-offset-2"
+              className="inline-flex items-center gap-2 text-white px-6 py-3 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2"
+              style={{
+                backgroundColor: getPrimaryColor(),
+                '--hover-color': getPrimaryColor() + 'dd',
+                '--tw-ring-color': getPrimaryColor()
+              } as React.CSSProperties}
             >
               <Search className="w-4 h-4" />
               Browse Products
@@ -494,7 +515,11 @@ export default function ProductDetailsPage() {
             <br />
             <Link
               href="/"
-              className="inline-flex items-center gap-2 text-gray-600 hover:text-[#b91c1c] transition-colors focus:outline-none focus:ring-2 focus:ring-[#b91c1c] focus:ring-offset-2 rounded"
+              className="inline-flex items-center gap-2 text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 rounded"
+              style={{
+                '--hover-color': getPrimaryColor(),
+                '--tw-ring-color': getPrimaryColor()
+              } as React.CSSProperties}
             >
               <Home className="w-4 h-4" />
               Back to Home
@@ -523,8 +548,11 @@ export default function ProductDetailsPage() {
                 <div className="relative">
                   <div
                     className={`relative aspect-square bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100 group transition-all duration-200 cursor-pointer ${
-                      zoomed ? "ring-2 ring-[#b91c1c]" : ""
+                      zoomed ? "ring-2" : ""
                     }`}
+                    style={zoomed ? {
+                      '--tw-ring-color': getPrimaryColor()
+                    } : {} as React.CSSProperties}
                     onMouseEnter={() => setZoomed(true)}
                     onMouseLeave={() => setZoomed(false)}
                     onClick={() =>
@@ -581,7 +609,11 @@ export default function ProductDetailsPage() {
                               prev === 0 ? product.images.length - 1 : prev - 1
                             );
                           }}
-                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-white bg-opacity-80 hover:bg-[#b91c1c] hover:text-white p-2 rounded-full shadow-md transition-all border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#b91c1c]"
+                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-white bg-opacity-80 hover:text-white p-2 rounded-full shadow-md transition-all border border-gray-200 focus:outline-none focus:ring-2"
+                          style={{
+                            '--hover-color': getPrimaryColor(),
+                            '--tw-ring-color': getPrimaryColor()
+                          } as React.CSSProperties}
                           aria-label="Previous image"
                         >
                           <ChevronLeft className="w-6 h-6" />
@@ -593,7 +625,11 @@ export default function ProductDetailsPage() {
                               prev === product.images.length - 1 ? 0 : prev + 1
                             );
                           }}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-white bg-opacity-80 hover:bg-[#b91c1c] hover:text-white p-2 rounded-full shadow-md transition-all border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#b91c1c]"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-white bg-opacity-80 hover:text-white p-2 rounded-full shadow-md transition-all border border-gray-200 focus:outline-none focus:ring-2"
+                          style={{
+                            '--hover-color': getPrimaryColor(),
+                            '--tw-ring-color': getPrimaryColor()
+                          } as React.CSSProperties}
                           aria-label="Next image"
                         >
                           <ChevronRight className="w-6 h-6" />
@@ -614,11 +650,18 @@ export default function ProductDetailsPage() {
                       <button
                         key={index}
                         onClick={() => setSelectedImage(index)}
-                        className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#b91c1c] ${
+                        className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-all duration-150 focus:outline-none focus:ring-2 ${
                           selectedImage === index
-                            ? "border-[#b91c1c] ring-2 ring-[#b91c1c]"
-                            : "border-gray-200 hover:border-[#b91c1c]"
+                            ? "border-gray-200 ring-2"
+                            : "border-gray-200"
                         }`}
+                        style={selectedImage === index ? {
+                          borderColor: getPrimaryColor(),
+                          '--tw-ring-color': getPrimaryColor()
+                        } : {
+                          '--hover-color': getPrimaryColor(),
+                          '--tw-ring-color': getPrimaryColor()
+                        } as React.CSSProperties}
                         role="tab"
                         aria-selected={selectedImage === index}
                         aria-label={`View image ${index + 1} of ${
@@ -693,7 +736,10 @@ export default function ProductDetailsPage() {
                 {/* Price */}
                 <div className="space-y-2">
                   <div className="flex items-center gap-3 flex-wrap">
-                    <span className="text-4xl font-bold text-[#b91c1c]">
+                    <span 
+                      className="text-4xl font-bold"
+                      style={{ color: getPrimaryColor() }}
+                    >
                       ₹{product.price.toLocaleString()}
                     </span>
                     {hasDiscount && (
@@ -748,7 +794,10 @@ export default function ProductDetailsPage() {
                       <button
                         onClick={() => handleQuantityChange(quantity - 1)}
                         disabled={quantity <= 1}
-                        className="px-3 py-2 text-gray-600 hover:text-gray-900 disabled:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#b91c1c] rounded-l"
+                        className="px-3 py-2 text-gray-600 hover:text-gray-900 disabled:text-gray-300 focus:outline-none focus:ring-2 rounded-l"
+                        style={{
+                          '--tw-ring-color': getPrimaryColor()
+                        } as React.CSSProperties}
                         aria-label="Decrease quantity"
                       >
                         -
@@ -762,13 +811,19 @@ export default function ProductDetailsPage() {
                         value={quantity}
                         onChange={handleQuantityInputChange}
                         onKeyDown={handleKeyDown}
-                        className="w-16 px-2 py-2 border-x border-gray-300 font-medium text-center focus:outline-none focus:ring-2 focus:ring-[#b91c1c]"
+                        className="w-16 px-2 py-2 border-x border-gray-300 font-medium text-center focus:outline-none focus:ring-2"
+                        style={{
+                          '--tw-ring-color': getPrimaryColor()
+                        } as React.CSSProperties}
                         aria-label="Product quantity"
                       />
                       <button
                         onClick={() => handleQuantityChange(quantity + 1)}
                         disabled={quantity >= product.stock}
-                        className="px-3 py-2 text-gray-600 hover:text-gray-900 disabled:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#b91c1c] rounded-r"
+                        className="px-3 py-2 text-gray-600 hover:text-gray-900 disabled:text-gray-300 focus:outline-none focus:ring-2 rounded-r"
+                        style={{
+                          '--tw-ring-color': getPrimaryColor()
+                        } as React.CSSProperties}
                         aria-label="Increase quantity"
                       >
                         +
@@ -785,7 +840,10 @@ export default function ProductDetailsPage() {
                   <button
                     onClick={handleAddToCart}
                     disabled={product.stock === 0 || cartLoading}
-                    className="flex-1 flex items-center justify-center gap-2 border border-gray-300 hover:border-gray-400 text-gray-600 bg-white py-3 px-6 rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#b91c1c] focus:ring-offset-2"
+                    className="flex-1 flex items-center justify-center gap-2 border border-gray-300 hover:border-gray-400 text-gray-600 bg-white py-3 px-6 rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2"
+                    style={{
+                      '--tw-ring-color': getPrimaryColor()
+                    } as React.CSSProperties}
                     aria-label="Add to Cart"
                   >
                     <ShoppingCart className="w-5 h-5" aria-hidden="true" />
@@ -800,7 +858,12 @@ export default function ProductDetailsPage() {
                   <button
                     onClick={handleBuyNow}
                     disabled={product.stock === 0}
-                    className="flex-1 flex items-center justify-center gap-2 bg-[#b91c1c] text-white py-3 px-6 rounded-md font-medium hover:bg-[#a31b1b] transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#b91c1c] focus:ring-offset-2"
+                    className="flex-1 flex items-center justify-center gap-2 text-white py-3 px-6 rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2"
+                    style={{
+                      backgroundColor: getPrimaryColor(),
+                      '--hover-color': getPrimaryColor() + 'dd',
+                      '--tw-ring-color': getPrimaryColor()
+                    } as React.CSSProperties}
                     aria-label="Buy Now"
                   >
                     <Zap className="w-5 h-5" aria-hidden="true" />
@@ -808,11 +871,14 @@ export default function ProductDetailsPage() {
                   </button>
                   <button
                     onClick={() => setIsWishlisted(!isWishlisted)}
-                    className={`p-3 rounded-md border transition-colors focus:outline-none focus:ring-2 focus:ring-[#b91c1c] focus:ring-offset-2 ${
+                    className={`p-3 rounded-md border transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                       isWishlisted
                         ? "border-red-300 bg-red-50 text-red-600"
                         : "border-gray-300 hover:border-gray-400 text-gray-600"
                     }`}
+                    style={{
+                      '--tw-ring-color': getPrimaryColor()
+                    } as React.CSSProperties}
                     aria-label={
                       isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"
                     }
@@ -826,7 +892,10 @@ export default function ProductDetailsPage() {
                   </button>
                   <button
                     onClick={() => setShareModalOpen(true)}
-                    className="p-3 rounded-md border border-gray-300 hover:border-gray-400 text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-[#b91c1c] focus:ring-offset-2"
+                    className="p-3 rounded-md border border-gray-300 hover:border-gray-400 text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2"
+                    style={{
+                      '--tw-ring-color': getPrimaryColor()
+                    } as React.CSSProperties}
                     aria-label="Share this product"
                     title="Share this product"
                   >
@@ -884,7 +953,7 @@ export default function ProductDetailsPage() {
               {/* Description Section */}
               <div className="sm:bg-white rounded-lg sm:shadow-md overflow-hidden p-4 sm:p-6 border border-gray-100">
                 <h2 className="text-xl font-bold mb-3 flex items-center gap-2">
-                  <span className="text-[#b91c1c]">Description</span>
+                  <span style={{ color: getPrimaryColor() }}>Description</span>
                 </h2>
                 <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed px-3">
                   <div
@@ -971,7 +1040,10 @@ export default function ProductDetailsPage() {
       {/* Sticky Mobile Action Bar */}
       {product && (
         <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg p-4 flex justify-between items-center sm:hidden z-20 border-t border-gray-200">
-          <span className="font-bold text-lg text-[#b91c1c]">
+          <span 
+            className="font-bold text-lg"
+            style={{ color: getPrimaryColor() }}
+          >
             ₹{product.price.toLocaleString()}
           </span>
           <button

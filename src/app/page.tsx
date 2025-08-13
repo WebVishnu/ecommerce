@@ -5,6 +5,7 @@ import ProductGrid from "@/components/ProductGrid";
 import Hero from "@/components/Hero";
 import CategoriesSection from "@/components/CategoriesSection";
 import LocationSection from "@/components/LocationSection";
+import { config } from "@/config/company-config";
 
 export default function Home() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
@@ -32,7 +33,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="bg-[#fff8f0]">
+    <div style={{ backgroundColor: config.branding.colors.background.tertiary }}>
       <div className="min-h-screen max-w-7xl mx-auto flex flex-col md:px-6 px-2 lg:px-16">
         <Hero />
         <CategoriesSection />

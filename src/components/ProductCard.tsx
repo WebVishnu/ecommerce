@@ -22,6 +22,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import DOMPurify from "dompurify";
+import { getPrimaryColor } from "@/config/company-config";
 
 interface ProductCardProps {
   product: Product;
@@ -168,7 +169,10 @@ export default function ProductCard({
           )}
           {/* Price & Discount */}
           <div className="flex items-end gap-2 mb-1">
-            <span className="text-lg font-bold text-[#b91c1c]">
+            <span 
+              className="text-lg font-bold"
+              style={{ color: getPrimaryColor() }}
+            >
               ₹{product.price.toLocaleString()}
             </span>
             {hasDiscount && (
@@ -308,7 +312,8 @@ export default function ProductCard({
                         updateCartItem(cartItem._id, cartQuantity - 1);
                       }
                     }}
-                    className="px-2 py-1 text-lg font-bold text-[#b91c1c] disabled:text-gray-300 hover:bg-gray-100 rounded transition-colors"
+                    className="px-2 py-1 text-lg font-bold disabled:text-gray-300 hover:bg-gray-100 rounded transition-colors"
+                    style={{ color: getPrimaryColor() }}
                     disabled={loading}
                     aria-label="Decrease quantity"
                   >
@@ -321,7 +326,8 @@ export default function ProductCard({
                     onClick={() =>
                       updateCartItem(cartItem._id, cartQuantity + 1)
                     }
-                    className="px-2 py-1 text-lg font-bold text-[#b91c1c] disabled:text-gray-300 hover:bg-gray-100 rounded transition-colors"
+                    className="px-2 py-1 text-lg font-bold disabled:text-gray-300 hover:bg-gray-100 rounded transition-colors"
+                    style={{ color: getPrimaryColor() }}
                     disabled={loading || cartQuantity >= product.stock}
                     aria-label="Increase quantity"
                   >
@@ -331,7 +337,10 @@ export default function ProductCard({
                 {/* Go to Cart Button */}
                 <button
                   onClick={handleGoToCart}
-                  className="sm:w-fit px-4 flex  items-center justify-center gap-2 py-2 h-full bg-[#b91c1c] hover:bg-[#a31b1b] text-white rounded-md font-medium transition-all duration-200 text-sm shadow-sm hover:shadow-md"
+                  className="sm:w-fit px-4 flex  items-center justify-center gap-2 py-2 h-full text-white rounded-md font-medium transition-all duration-200 text-sm shadow-sm hover:shadow-md"
+                  style={{ 
+                    backgroundColor: getPrimaryColor()
+                  } as React.CSSProperties}
                   aria-label="Go to cart"
                 >
                   Buy
@@ -347,9 +356,12 @@ export default function ProductCard({
                   product.stock > 0 && !loading
                     ? addedToCart
                       ? "bg-green-600 hover:bg-green-700 shadow-sm"
-                      : "bg-[#b91c1c] hover:bg-[#a31b1b] shadow-sm hover:shadow-md"
+                      : "shadow-sm hover:shadow-md"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
                 )}
+                style={product.stock > 0 && !loading && !addedToCart ? {
+                  backgroundColor: getPrimaryColor()
+                } : {} as React.CSSProperties}
                 aria-label={product.stock > 0 ? "Add to cart" : "Out of stock"}
               >
                 {loading ? (
@@ -455,7 +467,10 @@ export default function ProductCard({
         )}
         {/* Price & Discount */}
         <div className="flex items-end gap-2 mb-1">
-          <span className="text-lg font-bold text-[#b91c1c]">
+          <span 
+            className="text-lg font-bold"
+            style={{ color: getPrimaryColor() }}
+          >
             ₹{product.price.toLocaleString()}
           </span>
           {hasDiscount && (
@@ -591,7 +606,8 @@ export default function ProductCard({
                     updateCartItem(cartItem._id, cartQuantity - 1);
                   }
                 }}
-                className="px-2 py-1 text-lg font-bold text-[#b91c1c] disabled:text-gray-300 hover:bg-gray-100 rounded transition-colors"
+                className="px-2 py-1 text-lg font-bold disabled:text-gray-300 hover:bg-gray-100 rounded transition-colors"
+                style={{ color: getPrimaryColor() }}
                 disabled={loading}
                 aria-label="Decrease quantity"
               >
@@ -602,7 +618,8 @@ export default function ProductCard({
               </span>
               <button
                 onClick={() => updateCartItem(cartItem._id, cartQuantity + 1)}
-                className="px-2 py-1 text-lg font-bold text-[#b91c1c] disabled:text-gray-300 hover:bg-gray-100 rounded transition-colors"
+                className="px-2 py-1 text-lg font-bold disabled:text-gray-300 hover:bg-gray-100 rounded transition-colors"
+                style={{ color: getPrimaryColor() }}
                 disabled={loading || cartQuantity >= product.stock}
                 aria-label="Increase quantity"
               >
@@ -612,7 +629,10 @@ export default function ProductCard({
             {/* Go to Cart Button */}
             <button
               onClick={handleGoToCart}
-              className="sm:w-fit px-4 flex  items-center justify-center gap-2 py-2 h-full bg-[#b91c1c] hover:bg-[#a31b1b] text-white rounded-md font-medium transition-all duration-200 text-sm shadow-sm hover:shadow-md"
+              className="sm:w-fit px-4 flex  items-center justify-center gap-2 py-2 h-full text-white rounded-md font-medium transition-all duration-200 text-sm shadow-sm hover:shadow-md"
+              style={{ 
+                backgroundColor: getPrimaryColor()
+              } as React.CSSProperties}
               aria-label="Go to cart"
             >
               Buy
@@ -628,9 +648,12 @@ export default function ProductCard({
               product.stock > 0 && !loading
                 ? addedToCart
                   ? "bg-green-600 hover:bg-green-700 shadow-sm"
-                  : "bg-[#b91c1c] hover:bg-[#a31b1b] shadow-sm hover:shadow-md"
+                  : "shadow-sm hover:shadow-md"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
             )}
+                          style={product.stock > 0 && !loading && !addedToCart ? {
+                backgroundColor: getPrimaryColor()
+              } : {} as React.CSSProperties}
             aria-label={product.stock > 0 ? "Add to cart" : "Out of stock"}
           >
             {loading ? (

@@ -7,6 +7,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
+import { config, getPrimaryColor, getPrimaryPhone, getCompanyName } from "@/config/company-config";
 
 export default function MainNav() {
   const router = useRouter();
@@ -43,10 +44,15 @@ export default function MainNav() {
         {/* Left nav (desktop) */}
         <div className="hidden lg:flex items-center gap-8">
           <Link href="/" className="uppercase text-sm tracking-widest text-gray-700 hover:text-black">Home</Link>
-          <Link href="/search?category=inverter" className="uppercase text-sm tracking-widest text-gray-700 hover:text-black">Inverter</Link>
-          <Link href="/search?category=automotive" className="uppercase text-sm tracking-widest text-gray-700 hover:text-black">Automotive</Link>
-          <Link href="/search?category=solar" className="uppercase text-sm tracking-widest text-gray-700 hover:text-black">Solar</Link>
-          <Link href="/search?category=ups" className="uppercase text-sm tracking-widest text-gray-700 hover:text-black">UPS</Link>
+          {config.categories.map((category) => (
+            <Link 
+              key={category.id}
+              href={`/search?category=${category.id}`} 
+              className="uppercase text-sm tracking-widest text-gray-700 hover:text-black"
+            >
+              {category.name}
+            </Link>
+          ))}
         </div>
         {/* Hamburger (mobile) */}
         <button
@@ -64,7 +70,12 @@ export default function MainNav() {
         <div className="hidden lg:flex items-center gap-6">
           <Link href="/brands" className="uppercase text-sm tracking-widest text-gray-700 hover:text-black">Brands</Link>
           <Link href="/about" className="uppercase text-sm tracking-widest text-gray-700 hover:text-black">About Us</Link>
-          <a href="tel:+919761145106" className="uppercase text-sm tracking-widest text-gray-700 hover:text-black">Contact</a>
+          <a 
+            href={`tel:${getPrimaryPhone()}`} 
+            className="uppercase text-sm tracking-widest text-gray-700 hover:text-black"
+          >
+            Contact
+          </a>
           <Search onClick={() => router.push('/search')} className="h-5 w-5 text-gray-700 hover:text-black cursor-pointer" />
           {authHydrated && isAuthenticated ? (
             <div className="relative" ref={userMenuRef}>
@@ -131,7 +142,10 @@ export default function MainNav() {
           <div className="relative">
             <ShoppingCart onClick={() => router.push('/cart')} className="h-5 w-5 text-gray-700 hover:text-black cursor-pointer" />
             {cartHydrated && getCartItemCount() > 0 && (
-              <span className="absolute -top-2 -right-2 bg-[#b91c1c] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
+              <span 
+                className="absolute -top-2 -right-2 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium"
+                style={{ backgroundColor: getPrimaryColor() }}
+              >
                 {getCartItemCount() > 99 ? '99+' : getCartItemCount()}
               </span>
             )}
@@ -184,12 +198,16 @@ export default function MainNav() {
               </div>
             ) : authHydrated ? (
               <div className="p-6 border-b border-gray-200 bg-gray-50">
-                <p className="text-sm text-gray-600 mb-4">Welcome to Shivangi Battery</p>
+                <p className="text-sm text-gray-600 mb-4">Welcome to {getCompanyName()}</p>
                 <div className="grid grid-cols-2 gap-2">
                   <Link
                     href="/auth/otp"
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center justify-center gap-2 px-3 py-2 bg-[#b91c1c] text-white rounded-md text-sm hover:bg-[#a31b1b] transition-colors"
+                    className="flex items-center justify-center gap-2 px-3 py-2 text-white rounded-md text-sm transition-colors"
+                    style={{ 
+                      backgroundColor: getPrimaryColor(),
+                      '--hover-color': config.branding.colors.primary.dark
+                    } as React.CSSProperties}
                   >
                     <UserIcon className="w-4 h-4" />
                     Login
@@ -226,41 +244,26 @@ export default function MainNav() {
                     className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors" 
                     onClick={() => setMobileOpen(false)}
                   >
-                    <span className="w-2 h-2 bg-[#b91c1c] rounded-full"></span>
+                    <span 
+                      className="w-2 h-2 rounded-full"
+                      style={{ backgroundColor: getPrimaryColor() }}
+                    ></span>
                     Home
                   </Link>
-                  <Link 
-                    href="/search?category=inverter" 
-                    className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors" 
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    <span className="w-2 h-2 bg-[#b91c1c] rounded-full"></span>
-                    Inverter Batteries
-                  </Link>
-                  <Link 
-                    href="/search?category=automotive" 
-                    className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors" 
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    <span className="w-2 h-2 bg-[#b91c1c] rounded-full"></span>
-                    Automotive Batteries
-                  </Link>
-                  <Link 
-                    href="/search?category=solar" 
-                    className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors" 
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    <span className="w-2 h-2 bg-[#b91c1c] rounded-full"></span>
-                    Solar Batteries
-                  </Link>
-                  <Link 
-                    href="/search?category=ups" 
-                    className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors" 
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    <span className="w-2 h-2 bg-[#b91c1c] rounded-full"></span>
-                    UPS Batteries
-                  </Link>
+                  {config.categories.map((category) => (
+                    <Link 
+                      key={category.id}
+                      href={`/search?category=${category.id}`} 
+                      className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors" 
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      <span 
+                        className="w-2 h-2 rounded-full"
+                        style={{ backgroundColor: getPrimaryColor() }}
+                      ></span>
+                      {category.name}
+                    </Link>
+                  ))}
                 </div>
 
                 <div className="space-y-1 mt-6">
@@ -270,7 +273,10 @@ export default function MainNav() {
                     className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors" 
                     onClick={() => setMobileOpen(false)}
                   >
-                    <span className="w-2 h-2 bg-[#b91c1c] rounded-full"></span>
+                    <span 
+                      className="w-2 h-2 rounded-full"
+                      style={{ backgroundColor: getPrimaryColor() }}
+                    ></span>
                     Brands
                   </Link>
                   <Link 
@@ -278,10 +284,16 @@ export default function MainNav() {
                     className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors" 
                     onClick={() => setMobileOpen(false)}
                   >
-                    <span className="w-2 h-2 bg-[#b91c1c] rounded-full"></span>
+                    <span 
+                      className="w-2 h-2 rounded-full"
+                      style={{ backgroundColor: getPrimaryColor() }}
+                    ></span>
                     About Us
                   </Link>
-                  <a href="tel:+919761145106" className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
+                  <a 
+                    href={`tel:${getPrimaryPhone()}`} 
+                    className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                  >
                     <Phone className="w-4 h-4" />
                     Contact
                   </a>
@@ -312,7 +324,10 @@ export default function MainNav() {
                   <ShoppingCart className="w-5 h-5 text-gray-700" />
                   <span className="text-xs text-gray-700">Cart</span>
                   {cartHydrated && getCartItemCount() > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-[#b91c1c] text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-medium">
+                    <span 
+                      className="absolute -top-1 -right-1 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-medium"
+                      style={{ backgroundColor: getPrimaryColor() }}
+                    >
                       {getCartItemCount() > 9 ? '9+' : getCartItemCount()}
                     </span>
                   )}

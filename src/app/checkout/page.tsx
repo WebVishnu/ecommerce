@@ -20,6 +20,7 @@ import {
   Clock,
   Package,
 } from "lucide-react";
+import { getPrimaryColor } from "@/config/company-config";
 
 interface ShippingAddress {
   name: string;
@@ -348,7 +349,10 @@ export default function CheckoutPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#b91c1c] mx-auto"></div>
+          <div 
+            className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto"
+            style={{ borderBottomColor: getPrimaryColor() }}
+          ></div>
           <p className="mt-4 text-gray-600">Loading checkout...</p>
         </div>
       </div>
@@ -447,14 +451,23 @@ export default function CheckoutPage() {
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
                 <button
                   onClick={handleDownloadInvoice}
-                  className="flex items-center justify-center gap-2 bg-[#b91c1c] text-white px-4 sm:px-6 py-3 rounded-md hover:bg-[#a31b1b] transition-colors font-medium text-sm sm:text-base"
+                  className="flex items-center justify-center gap-2 text-white px-4 sm:px-6 py-3 rounded-md transition-colors font-medium text-sm sm:text-base"
+                  style={{
+                    backgroundColor: getPrimaryColor(),
+                    '--hover-color': getPrimaryColor() + 'dd'
+                  } as React.CSSProperties}
                 >
                   <Download className="w-4 h-4 sm:w-5 sm:h-5" />
                   Download Invoice
                 </button>
                 <Link
                   href={`/orders/${orderData?.data?.order?._id}`}
-                  className="flex items-center justify-center gap-2 bg-white border-2 border-[#b91c1c] text-[#b91c1c] px-4 sm:px-6 py-3 rounded-md hover:bg-[#b91c1c] hover:text-white transition-colors font-medium text-sm sm:text-base"
+                  className="flex items-center justify-center gap-2 border-2 text-white px-4 sm:px-6 py-3 rounded-md transition-colors font-medium text-sm sm:text-base"
+                  style={{
+                    borderColor: getPrimaryColor(),
+                    color: getPrimaryColor(),
+                    '--hover-color': getPrimaryColor() + 'dd'
+                  } as React.CSSProperties}
                 >
                   View Order Details
                 </Link>
@@ -474,7 +487,7 @@ export default function CheckoutPage() {
                 </p>
                 <p>
                   Need help? Contact our support team at{" "}
-                  <span className="text-[#b91c1c]">
+                  <span style={{ color: getPrimaryColor() }}>
                     support@shivangibattery.com
                   </span>
                 </p>
@@ -529,21 +542,27 @@ export default function CheckoutPage() {
                       <div
                         className={`flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full text-xs sm:text-sm font-medium ${
                           step === stepItem.key
-                            ? "bg-[#b91c1c] text-white"
+                            ? "text-white"
                             : index <
                               ["address", "payment", "review"].indexOf(step)
                             ? "bg-green-500 text-white"
                             : "bg-gray-200 text-gray-600"
                         }`}
+                        style={step === stepItem.key ? {
+                          backgroundColor: getPrimaryColor()
+                        } : {} as React.CSSProperties}
                       >
                         {index + 1}
                       </div>
                       <span
                         className={`ml-1 text-xs sm:text-sm font-medium ${
                           step === stepItem.key
-                            ? "text-[#b91c1c]"
+                            ? ""
                             : "text-gray-500"
                         }`}
+                        style={step === stepItem.key ? {
+                          color: getPrimaryColor()
+                        } : {} as React.CSSProperties}
                       >
                         <span className="hidden sm:block">
                           {stepItem.label}
@@ -587,9 +606,14 @@ export default function CheckoutPage() {
                             className={`border rounded-lg p-3 sm:p-4 cursor-pointer transition-colors ${
                               selectedAddressId ===
                               (address._id || index.toString())
-                                ? "border-[#b91c1c] bg-[#b91c1c]/5"
+                                ? "border-gray-200 bg-gray-50"
                                 : "border-gray-200 hover:border-gray-300"
                             }`}
+                            style={selectedAddressId ===
+                              (address._id || index.toString()) ? {
+                              borderColor: getPrimaryColor(),
+                              backgroundColor: getPrimaryColor() + '05'
+                            } : {} as React.CSSProperties}
                             onClick={() => handleAddressSelect(address)}
                           >
                             <div className="flex items-start justify-between">
@@ -622,9 +646,14 @@ export default function CheckoutPage() {
                                 className={`w-4 h-4 rounded-full border-2 flex-shrink-0 ml-2 ${
                                   selectedAddressId ===
                                   (address._id || index.toString())
-                                    ? "border-[#b91c1c] bg-[#b91c1c]"
+                                    ? "border-gray-300"
                                     : "border-gray-300"
                                 }`}
+                                style={selectedAddressId ===
+                                  (address._id || index.toString()) ? {
+                                  borderColor: getPrimaryColor(),
+                                  backgroundColor: getPrimaryColor()
+                                } : {} as React.CSSProperties}
                               >
                                 {selectedAddressId ===
                                   (address._id || index.toString()) && (
@@ -644,7 +673,11 @@ export default function CheckoutPage() {
                         onClick={() =>
                           setShowNewAddressForm(!showNewAddressForm)
                         }
-                        className="flex items-center gap-2 text-[#b91c1c] hover:text-[#a31b1b] transition-colors text-sm sm:text-base"
+                        className="flex items-center gap-2 transition-colors text-sm sm:text-base"
+                        style={{
+                          color: getPrimaryColor(),
+                          '--hover-color': getPrimaryColor() + 'dd'
+                        } as React.CSSProperties}
                       >
                         <Plus className="w-4 h-4" />
                         {showNewAddressForm ? "Cancel" : "Add New Address"}
@@ -668,7 +701,11 @@ export default function CheckoutPage() {
                               onChange={(e) =>
                                 handleNewAddressChange("name", e.target.value)
                               }
-                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#b91c1c] text-sm"
+                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent text-sm"
+                              style={{
+                                '--tw-ring-color': getPrimaryColor(),
+                                '--tw-ring-opacity': '0.5'
+                              } as React.CSSProperties}
                               placeholder="Recipient name"
                             />
                           </div>
@@ -686,7 +723,11 @@ export default function CheckoutPage() {
                                   e.target.value.replace(/\D/g, "")
                                 )
                               }
-                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#b91c1c] text-sm"
+                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent text-sm"
+                              style={{
+                                '--tw-ring-color': getPrimaryColor(),
+                                '--tw-ring-opacity': '0.5'
+                              } as React.CSSProperties}
                               placeholder="10-digit mobile number"
                             />
                           </div>
@@ -700,7 +741,11 @@ export default function CheckoutPage() {
                               onChange={(e) =>
                                 handleNewAddressChange("street", e.target.value)
                               }
-                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#b91c1c] text-sm"
+                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent text-sm"
+                              style={{
+                                '--tw-ring-color': getPrimaryColor(),
+                                '--tw-ring-opacity': '0.5'
+                              } as React.CSSProperties}
                               placeholder="House/Flat number, Street name"
                             />
                           </div>
@@ -714,7 +759,11 @@ export default function CheckoutPage() {
                               onChange={(e) =>
                                 handleNewAddressChange("city", e.target.value)
                               }
-                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#b91c1c] text-sm"
+                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent text-sm"
+                              style={{
+                                '--tw-ring-color': getPrimaryColor(),
+                                '--tw-ring-opacity': '0.5'
+                              } as React.CSSProperties}
                               placeholder="City"
                             />
                           </div>
@@ -728,7 +777,11 @@ export default function CheckoutPage() {
                               onChange={(e) =>
                                 handleNewAddressChange("state", e.target.value)
                               }
-                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#b91c1c] text-sm"
+                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent text-sm"
+                              style={{
+                                '--tw-ring-color': getPrimaryColor(),
+                                '--tw-ring-opacity': '0.5'
+                              } as React.CSSProperties}
                               placeholder="State"
                             />
                           </div>
@@ -746,7 +799,11 @@ export default function CheckoutPage() {
                                   e.target.value.replace(/\D/g, "")
                                 )
                               }
-                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#b91c1c] text-sm"
+                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent text-sm"
+                              style={{
+                                '--tw-ring-color': getPrimaryColor(),
+                                '--tw-ring-opacity': '0.5'
+                              } as React.CSSProperties}
                               placeholder="6-digit pincode"
                             />
                           </div>
@@ -763,7 +820,11 @@ export default function CheckoutPage() {
                                   e.target.value
                                 )
                               }
-                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#b91c1c] text-sm"
+                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent text-sm"
+                              style={{
+                                '--tw-ring-color': getPrimaryColor(),
+                                '--tw-ring-opacity': '0.5'
+                              } as React.CSSProperties}
                               placeholder="Nearby landmark"
                             />
                           </div>
@@ -772,7 +833,11 @@ export default function CheckoutPage() {
                           <button
                             type="button"
                             onClick={handleAddNewAddress}
-                            className="bg-[#b91c1c] text-white px-4 py-2 rounded-md hover:bg-[#a31b1b] transition-colors text-sm sm:text-base"
+                            className="text-white px-4 py-2 rounded-md transition-colors text-sm sm:text-base"
+                            style={{
+                              backgroundColor: getPrimaryColor(),
+                              '--hover-color': getPrimaryColor() + 'dd'
+                            } as React.CSSProperties}
                           >
                             Use This Address
                           </button>
@@ -825,9 +890,13 @@ export default function CheckoutPage() {
                           key={method.id}
                           className={`flex items-center p-3 sm:p-4 border rounded-md cursor-pointer transition-colors ${
                             selectedPaymentMethod === method.id
-                              ? "border-[#b91c1c] bg-[#b91c1c]/5"
+                              ? "border-gray-200 bg-gray-50"
                               : "border-gray-200 hover:border-gray-300"
                           }`}
+                          style={selectedPaymentMethod === method.id ? {
+                            borderColor: getPrimaryColor(),
+                            backgroundColor: getPrimaryColor() + '05'
+                          } : {} as React.CSSProperties}
                         >
                           <input
                             type="radio"
@@ -843,12 +912,18 @@ export default function CheckoutPage() {
                             <div
                               className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 flex items-center justify-center ${
                                 selectedPaymentMethod === method.id
-                                  ? "border-[#b91c1c]"
+                                  ? "border-gray-300"
                                   : "border-gray-300"
                               }`}
+                              style={selectedPaymentMethod === method.id ? {
+                                borderColor: getPrimaryColor()
+                              } : {} as React.CSSProperties}
                             >
                               {selectedPaymentMethod === method.id && (
-                                <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-[#b91c1c] rounded-full"></div>
+                                <div 
+                                  className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full"
+                                  style={{ backgroundColor: getPrimaryColor() }}
+                                ></div>
                               )}
                             </div>
                             <div className="flex items-center gap-3">
@@ -936,7 +1011,11 @@ export default function CheckoutPage() {
                       <textarea
                         value={orderNotes}
                         onChange={(e) => setOrderNotes(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#b91c1c] text-sm"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent text-sm"
+                        style={{
+                          '--tw-ring-color': getPrimaryColor(),
+                          '--tw-ring-opacity': '0.5'
+                        } as React.CSSProperties}
                         placeholder="Any special instructions for delivery..."
                         rows={3}
                       />
@@ -1022,7 +1101,11 @@ export default function CheckoutPage() {
                 {step !== "review" ? (
                   <button
                     onClick={handleNextStep}
-                    className="w-full bg-[#b91c1c] text-white py-2 rounded-md hover:bg-[#a31b1b] transition-colors text-sm sm:text-base"
+                    className="w-full text-white py-2 rounded-md transition-colors text-sm sm:text-base"
+                    style={{
+                      backgroundColor: getPrimaryColor(),
+                      '--hover-color': getPrimaryColor() + 'dd'
+                    } as React.CSSProperties}
                   >
                     Continue
                   </button>
@@ -1030,7 +1113,11 @@ export default function CheckoutPage() {
                   <button
                     onClick={handlePlaceOrder}
                     disabled={loading}
-                    className="w-full bg-[#b91c1c] text-white py-2 rounded-md hover:bg-[#a31b1b] transition-colors disabled:opacity-50 flex items-center justify-center gap-2 text-sm sm:text-base"
+                    className="w-full text-white py-2 rounded-md transition-colors disabled:opacity-50 flex items-center justify-center gap-2 text-sm sm:text-base"
+                    style={{
+                      backgroundColor: getPrimaryColor(),
+                      '--hover-color': getPrimaryColor() + 'dd'
+                    } as React.CSSProperties}
                   >
                     {loading ? (
                       <>

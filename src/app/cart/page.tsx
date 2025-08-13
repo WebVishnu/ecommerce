@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import { getPrimaryColor } from '@/config/company-config';
 
 export default function CartPage() {
   const { cart, loading, error, updateCartItem, removeFromCart, clearCart, clearError, isHydrated: cartHydrated } = useCart();
@@ -68,7 +69,10 @@ export default function CartPage() {
       <div className="min-h-screen bg-gray-50 py-12">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#b91c1c] mx-auto"></div>
+            <div 
+              className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto"
+              style={{ borderBottomColor: getPrimaryColor() }}
+            ></div>
             <p className="mt-4 text-gray-600">Loading your cart...</p>
           </div>
         </div>
@@ -88,7 +92,11 @@ export default function CartPage() {
             <div className="flex gap-4 justify-center">
               <Link
                 href="/auth/otp"
-                className="bg-[#b91c1c] text-white px-6 py-2 rounded-md hover:bg-[#a31b1b] transition-colors"
+                className="text-white px-6 py-2 rounded-md transition-colors"
+                style={{
+                  backgroundColor: getPrimaryColor(),
+                  '--hover-color': getPrimaryColor() + 'dd'
+                } as React.CSSProperties}
               >
                 Login
               </Link>
@@ -116,7 +124,11 @@ export default function CartPage() {
             <p className="text-gray-600 mb-4">{error}</p>
             <button
               onClick={() => { if (typeof window !== 'undefined') window.location.reload(); }}
-              className="bg-[#b91c1c] text-white px-4 py-2 rounded-md hover:bg-[#a31b1b] transition-colors"
+              className="text-white px-4 py-2 rounded-md transition-colors"
+              style={{
+                backgroundColor: getPrimaryColor(),
+                '--hover-color': getPrimaryColor() + 'dd'
+              } as React.CSSProperties}
             >
               Try Again
             </button>
@@ -136,7 +148,11 @@ export default function CartPage() {
             <p className="text-gray-600 mb-6">Looks like you haven't added any items to your cart yet.</p>
             <Link
               href="/search"
-              className="bg-[#b91c1c] text-white px-6 py-2 rounded-md hover:bg-[#a31b1b] transition-colors inline-flex items-center gap-2"
+              className="text-white px-6 py-2 rounded-md transition-colors inline-flex items-center gap-2"
+              style={{
+                backgroundColor: getPrimaryColor(),
+                '--hover-color': getPrimaryColor() + 'dd'
+              } as React.CSSProperties}
             >
               <ArrowLeft className="w-4 h-4" />
               Continue Shopping
@@ -234,7 +250,10 @@ export default function CartPage() {
 
                         {/* Price and Quantity */}
                         <div className="flex items-center justify-between mt-4">
-                          <div className="text-lg font-semibold text-[#b91c1c]">
+                          <div 
+                            className="text-lg font-semibold"
+                            style={{ color: getPrimaryColor() }}
+                          >
                             ₹{item.price.toLocaleString()}
                           </div>
                           
@@ -306,14 +325,18 @@ export default function CartPage() {
                 <hr className="border-gray-200" />
                 <div className="flex justify-between text-lg font-semibold">
                   <span>Total</span>
-                  <span className="text-[#b91c1c]">₹{cart.total.toLocaleString()}</span>
+                  <span style={{ color: getPrimaryColor() }}>₹{cart.total.toLocaleString()}</span>
                 </div>
               </div>
 
               <button
                 onClick={handleCheckout}
                 disabled={loading}
-                className="w-full bg-[#b91c1c] text-white py-3 px-4 rounded-md font-medium hover:bg-[#a31b1b] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full text-white py-3 px-4 rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: getPrimaryColor(),
+                  '--hover-color': getPrimaryColor() + 'dd'
+                } as React.CSSProperties}
               >
                 {loading ? 'Processing...' : 'Proceed to Checkout'}
               </button>

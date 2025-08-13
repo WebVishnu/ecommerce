@@ -17,6 +17,7 @@ import {
   Clock,
 } from "lucide-react";
 import Image from "next/image";
+import { getPrimaryColor } from "@/config/company-config";
 
 interface OrderItem {
   _id: string;
@@ -444,7 +445,10 @@ export default function OrderDetailsPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#b91c1c] mx-auto"></div>
+          <div 
+            className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto"
+            style={{ borderBottomColor: getPrimaryColor() }}
+          ></div>
           <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </div>
@@ -455,7 +459,10 @@ export default function OrderDetailsPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#b91c1c] mx-auto"></div>
+          <div 
+            className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto"
+            style={{ borderBottomColor: getPrimaryColor() }}
+          ></div>
           <p className="mt-4 text-gray-600">Loading order details...</p>
         </div>
       </div>
@@ -475,7 +482,11 @@ export default function OrderDetailsPage() {
             <div className="flex gap-4 justify-center">
               <Link
                 href="/profile?tab=orders"
-                className="bg-[#b91c1c] text-white px-6 py-2 rounded-md hover:bg-[#a31b1b] transition-colors"
+                className="text-white px-6 py-2 rounded-md transition-colors"
+                style={{
+                  backgroundColor: getPrimaryColor(),
+                  '--hover-color': getPrimaryColor() + 'dd'
+                } as React.CSSProperties}
               >
                 Back to Orders
               </Link>
@@ -508,7 +519,11 @@ export default function OrderDetailsPage() {
             <div className="flex gap-4 justify-center">
               <Link
                 href="/profile?tab=orders"
-                className="bg-[#b91c1c] text-white px-6 py-2 rounded-md hover:bg-[#a31b1b] transition-colors"
+                className="text-white px-6 py-2 rounded-md transition-colors"
+                style={{
+                  backgroundColor: getPrimaryColor(),
+                  '--hover-color': getPrimaryColor() + 'dd'
+                } as React.CSSProperties}
               >
                 Back to Orders
               </Link>
@@ -567,10 +582,17 @@ export default function OrderDetailsPage() {
                   <button
                     onClick={handleDownloadInvoice}
                     disabled={actionLoading === "download"}
-                    className="px-3 py-1 text-sm text-[#b91c1c] hover:bg-[#b91c1c]/10 rounded-md transition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-3 py-1 text-sm rounded-md transition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{
+                      color: getPrimaryColor(),
+                      '--hover-color': getPrimaryColor() + '10'
+                    } as React.CSSProperties}
                   >
                     {actionLoading === "download" ? (
-                      <div className="w-4 h-4 border-2 border-[#b91c1c] border-t-transparent rounded-full animate-spin"></div>
+                      <div 
+                        className="w-4 h-4 border-2 border-t-transparent rounded-full animate-spin"
+                        style={{ borderColor: getPrimaryColor() }}
+                      ></div>
                     ) : (
                       <svg
                         className="w-4 h-4"
